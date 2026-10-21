@@ -1,0 +1,1691 @@
+<!doctype html>
+<html>
+  <head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+    <title>
+      Hydrogen Orbital Visualizer
+    </title>
+    <style>
+      html,body {
+        margin:0;
+        width:100%;
+        height:100%;
+        overflow:hidden;
+        background:#070a10;
+        color:#eee;
+        font-family:Arial,sans-serif
+      }
+      canvas {
+        display:block;
+        width:100%;
+        height:100%;
+        touch-action:none
+      }
+      #c {
+        position:fixed;
+        inset:0;
+        z-index:1
+      }
+      #balloonCanvas {
+        position:fixed;
+        inset:0;
+        z-index:0;
+        pointer-events:none
+      }
+      #balloonCanvas[hidden] {
+        display:none
+      }
+      #ui {
+        position:fixed;
+        z-index:10;
+        left:16px;
+        top:16px;
+        width:430px;
+        max-height:calc(100vh - 32px);
+        overflow-y:auto;
+        overflow-x:hidden;
+        overscroll-behavior:contain;
+        scrollbar-gutter:stable;
+        background:#151a27ee;
+        border:1px solid #2b3245;
+        border-radius:12px;
+        padding:18px;
+        box-sizing:border-box;
+        backdrop-filter: blur(4px);
+        font-size:15px;
+      }
+      select,input,button {
+        width:100%;
+        margin:7px 0 13px
+      }
+      label {
+        font-size:15px
+      }
+      .row {
+        display:flex;
+        gap:16px;
+        font-size:15px;
+        align-items:center;
+        flex-wrap:wrap
+      }
+      .small {
+        font-size:14px;
+        color:#c2cad8;
+        line-height:1.5
+      }
+      .sw {
+        display:inline-block;
+        width:11px;
+        height:11px;
+        border-radius:50%;
+        margin-right:6px
+      }
+      .p {
+        background:#ff6048
+      }
+      .m {
+        background:#3d9cff
+      }
+      .hint {
+        color:#9eb2d7;
+        font-size:12px
+      }
+      button {
+        background:#24304d;
+        color:#fff;
+        border:1px solid #40537d;
+        border-radius:8px;
+        padding:10px 12px;
+        cursor:pointer;
+        font-size:14px
+      }
+      button:hover {
+        background:#2c3a5e
+      }
+      .chkrow {
+        display:flex;
+        gap:18px;
+        align-items:center;
+        margin:4px 0 12px;
+        flex-wrap:wrap
+      }
+      .chkrow label {
+        display:flex;
+        gap:8px;
+        align-items:center;
+        font-size:14px
+      }
+      .chkrow input {
+        width:auto;
+        margin:0
+      }
+      .title {
+        font-size:18px;
+        font-weight:700
+      }
+      #copyright {
+        position:fixed;
+        right:12px;
+        bottom:12px;
+        z-index:11;
+        padding:6px 10px;
+        border-radius:6px;
+        background:#151a27cc;
+        color:#c2cad8;
+        font-size:12px;
+        pointer-events:none;
+      }
+      #ui::-webkit-scrollbar {
+        width:10px
+      }
+      #ui::-webkit-scrollbar-track {
+        background:transparent
+      }
+      #ui::-webkit-scrollbar-thumb {
+        background:#4a5570;
+        border-radius:8px;
+        border:2px solid transparent;
+        background-clip:padding-box
+      }
+      #ui {
+        scrollbar-width:thin;
+        scrollbar-color:#4a5570 transparent
+      }
+      #controlsToggle {
+        display:none;
+        position:fixed;
+        left:max(12px,env(safe-area-inset-left));
+        bottom:max(12px,env(safe-area-inset-bottom));
+        z-index:12;
+        width:auto;
+        min-height:44px;
+        margin:0;
+        padding:10px 16px;
+        border-radius:24px;
+        box-shadow:0 3px 16px #0006;
+        touch-action:manipulation;
+      }
+      #controlsToggle[hidden],#ui[hidden] {
+        display:none
+      }
+      .mobileHint {
+        display:none
+      }
+      @media (max-width:700px), (pointer:coarse) and (max-height:500px) {
+        #ui {
+          left:max(10px,env(safe-area-inset-left));
+          right:max(10px,env(safe-area-inset-right));
+          top:auto;
+          bottom:calc(70px + env(safe-area-inset-bottom));
+          width:auto;
+          max-height:48vh;
+          max-height:48dvh;
+          padding:16px;
+        }
+        #ui:not(.mobile-open) {
+          display:none
+        }
+        #controlsToggle {
+          display:block
+        }
+        #ui select,#ui button {
+          min-height:44px;
+          font-size:16px
+        }
+        #ui input[type="range"] {
+          height:44px;
+          touch-action:pan-y
+        }
+        #ui .chkrow label {
+          min-height:44px;
+          font-size:15px
+        }
+        #ui .chkrow input {
+          width:22px;
+          height:22px
+        }
+        .desktopHint {
+          display:none
+        }
+        .mobileHint {
+          display:inline
+        }
+        #copyright {
+          right:max(10px,env(safe-area-inset-right));
+          bottom:max(12px,env(safe-area-inset-bottom));
+          font-size:10px;
+          padding:4px 6px;
+        }
+      }
+    </style>
+  </head>
+  <body>
+    <button id="controlsToggle" type="button" aria-controls="ui" aria-expanded="false" hidden>
+      Controls
+    </button>
+    <div id="ui">
+      <div class="title">
+        Hydrogen Orbital Visualizer
+      </div><br>
+      <label for="orb">
+        Orbital
+      </label>
+      <select id="orb">
+        <optgroup label="s orbitals">
+        <option value="1s">
+          1s
+        </option>
+        <option value="2s">
+          2s
+        </option>
+        <option value="3s">
+          3s
+        </option>
+        <option value="4s">
+          4s
+        </option>
+        <option value="5s">
+          5s
+        </option>
+        <option value="6s">
+          6s
+        </option>
+        <option value="7s">
+          7s
+        </option></optgroup><optgroup label="p orbitals">
+        <option value="2px">
+          2p_x
+        </option>
+        <option value="2py">
+          2p_y
+        </option>
+        <option value="2pz">
+          2p_z
+        </option>
+        <option value="3px">
+          3p_x
+        </option>
+        <option value="3py">
+          3p_y
+        </option>
+        <option value="3pz">
+          3p_z
+        </option>
+        <option value="4px">
+          4p_x
+        </option>
+        <option value="4py">
+          4p_y
+        </option>
+        <option value="4pz">
+          4p_z
+        </option>
+        <option value="5px">
+          5p_x
+        </option>
+        <option value="5py">
+          5p_y
+        </option>
+        <option value="5pz">
+          5p_z
+        </option>
+        <option value="6px">
+          6p_x
+        </option>
+        <option value="6py">
+          6p_y
+        </option>
+        <option value="6pz">
+          6p_z
+        </option>
+        <option value="7px">
+          7p_x
+        </option>
+        <option value="7py">
+          7p_y
+        </option>
+        <option value="7pz">
+          7p_z
+        </option></optgroup><optgroup label="d orbitals">
+        <option value="3dz2">
+          3d_z²
+        </option>
+        <option value="3dxy">
+          3d_xy
+        </option>
+        <option value="3dxz">
+          3d_xz
+        </option>
+        <option value="3dyz">
+          3d_yz
+        </option>
+        <option value="3dx2-y2">
+          3d_x²−y²
+        </option>
+        <option value="4dz2">
+          4d_z²
+        </option>
+        <option value="4dxy">
+          4d_xy
+        </option>
+        <option value="4dxz">
+          4d_xz
+        </option>
+        <option value="4dyz">
+          4d_yz
+        </option>
+        <option value="4dx2-y2">
+          4d_x²−y²
+        </option>
+        <option value="5dz2">
+          5d_z²
+        </option>
+        <option value="5dxy">
+          5d_xy
+        </option>
+        <option value="5dxz">
+          5d_xz
+        </option>
+        <option value="5dyz">
+          5d_yz
+        </option>
+        <option value="5dx2-y2">
+          5d_x²−y²
+        </option>
+        <option value="6dz2">
+          6d_z²
+        </option>
+        <option value="6dxy">
+          6d_xy
+        </option>
+        <option value="6dxz">
+          6d_xz
+        </option>
+        <option value="6dyz">
+          6d_yz
+        </option>
+        <option value="6dx2-y2">
+          6d_x²−y²
+        </option></optgroup><optgroup label="f orbitals">
+        <option value="4fz3">
+          4f_z³ — z(5z²−3r²)
+        </option>
+        <option value="4fxz2">
+          4f_xz² — x(5z²−r²)
+        </option>
+        <option value="4fyz2">
+          4f_yz² — y(5z²−r²)
+        </option>
+        <option value="4fzx2-y2">
+          4f_z(x²−y²) — z(x²−y²)
+        </option>
+        <option value="4fxyz">
+          4f_xyz — xyz
+        </option>
+        <option value="4fxx2-3y2">
+          4f_x(x²−3y²)
+        </option>
+        <option value="4fy3x2-y2">
+          4f_y(3x²−y²)
+        </option>
+        <option value="5fz3">
+          5f_z³ — z(5z²−3r²)
+        </option>
+        <option value="5fxz2">
+          5f_xz² — x(5z²−r²)
+        </option>
+        <option value="5fyz2">
+          5f_yz² — y(5z²−r²)
+        </option>
+        <option value="5fzx2-y2">
+          5f_z(x²−y²) — z(x²−y²)
+        </option>
+        <option value="5fxyz">
+          5f_xyz — xyz
+        </option>
+        <option value="5fxx2-3y2">
+          5f_x(x²−3y²)
+        </option>
+        <option value="5fy3x2-y2">
+          5f_y(3x²−y²)
+        </option></optgroup>
+      </select>
+      <label for="illustration">
+        Illustration
+      </label>
+      <select id="illustration">
+        <option value="dots">
+          Dots
+        </option>
+        <option value="balloon">
+          Balloon contours
+        </option>
+      </select>
+      <label for="cut">
+        Density cutoff <span id="cutv"></span>
+      </label><input id="cut" type="range" min="1" max="95" value="30">
+      <div id="dotControls">
+        <label for="num">
+          Source samples <span id="nv"></span>
+        </label><input id="num" type="range" min="20000" max="500000" step="5000" value="60000">
+        <label for="ps">
+          Dot size <span id="psv"></span>
+        </label><input id="ps" type="range" min="2" max="18" value="8">
+        <label for="dotAlpha">
+          Dot transparency (0 = opaque, 1 = invisible) <span id="dotav"></span>
+        </label><input id="dotAlpha" type="range" min="0" max="1" step="0.01" value="0.80">
+      </div>
+      <div id="balloonControls" hidden>
+        <label for="balloonAlpha">
+          Balloon transparency (0 = opaque, 1 = invisible) <span id="balloonav"></span>
+        </label><input id="balloonAlpha" type="range" min="0" max="1" step="0.01" value="0.15">
+      </div>
+      <label for="clip">
+        Cutaway amount <span id="clipv"></span>
+      </label><input id="clip" type="range" min="0" max="95" value="45">
+      <label for="axis">
+        Cutaway axis
+      </label>
+      <select id="axis">
+        <option value="auto">
+          Auto (orbital-specific)
+        </option>
+        <option value="x">
+          x
+        </option>
+        <option value="y">
+          y
+        </option>
+        <option value="z">
+          z
+        </option>
+      </select>
+      <label for="bgMode">
+        Background
+      </label>
+      <select id="bgMode">
+        <option value="black">
+          Black
+        </option>
+        <option value="white">
+          White
+        </option>
+      </select>
+      <div class="chkrow">
+        <label>
+          <input type="checkbox" id="useColours" checked> Use colours
+        </label>
+      </div>
+      <div class="chkrow">
+        <label>
+          <input type="checkbox" id="showAxes" checked> Show axes
+        </label>
+        <label>
+          <input type="checkbox" id="showRadial"> Show radial nodes
+        </label>
+        <label>
+          <input type="checkbox" id="showAngular"> Show angular nodes
+        </label>
+      </div>
+      <label for="nodeAlpha">
+        Node transparency (0 = opaque, 1 = invisible) <span id="nodeav"></span>
+      </label><input id="nodeAlpha" type="range" min="0" max="1" step="0.01" value="0.25">
+      <div class="hint">
+        Auto axis uses orbital-specific cut directions for p, d, and f orbitals to expose radial structure.
+      </div><br>
+      <div class="row">
+        <span><i class="sw p"></i>+ψ</span><span><i class="sw m"></i>−ψ</span>
+      </div>
+      <button id="reset">
+        Reset view
+      </button>
+      <p id="info" class="small">
+      </p>
+      <div class="small">
+        <span class="desktopHint">Drag to rotate • wheel to zoom</span><span class="mobileHint">Drag to rotate • pinch to zoom</span>
+      </div>
+    </div><canvas id="balloonCanvas" aria-hidden="true" hidden></canvas><canvas id="c"></canvas>
+    <footer id="copyright">
+      © University of Waterloo
+    </footer>
+    <script>
+"use strict";
+const C=document.getElementById("c"), X=C.getContext("2d");
+const illustration=document.getElementById("illustration"),
+      balloonAlpha=document.getElementById("balloonAlpha"),
+      balloonav=document.getElementById("balloonav");
+const orb=document.getElementById("orb"), cut=document.getElementById("cut"),
+      num=document.getElementById("num"), ps=document.getElementById("ps"),
+      dotAlpha=document.getElementById("dotAlpha"),
+      clip=document.getElementById("clip"), axisSel=document.getElementById("axis"),
+      bgMode=document.getElementById("bgMode"),
+      useColours=document.getElementById("useColours"),
+      showAxes=document.getElementById("showAxes"),
+      showRadial=document.getElementById("showRadial"),
+      showAngular=document.getElementById("showAngular"),
+      nodeAlpha=document.getElementById("nodeAlpha"),
+      info=document.getElementById("info");
+const cutv=document.getElementById("cutv"), nv=document.getElementById("nv"),
+      psv=document.getElementById("psv"), clipv=document.getElementById("clipv"),
+      nodeav=document.getElementById("nodeav"), dotav=document.getElementById("dotav"),
+      resetBtn=document.getElementById("reset");
+
+const controlsPanel=document.getElementById("ui"),controlsToggle=document.getElementById("controlsToggle");
+const phoneLayout=window.matchMedia("(max-width:700px), (pointer:coarse) and (max-height:500px)");
+
+let W,H,DPR, rx=-0.48, ry=0.82, zoom=1, drag=false, lx=0, ly=0;
+let cloud=[], extent=10, usedAxis="x", nodeRadii=[];
+let activePointerId = null;
+let densityMax = 1;
+let dirty = true;
+let cacheKey = "";
+let masterPoints = [];
+let masterKey = "";
+const MAX_MASTER_SAMPLES = 500000;
+const MAX_RENDER_DOTS = 30000;
+const BASE_SAMPLE_WINDOW = 60000;
+const BASE_RENDER_STRIDE = 4;
+const EXTRA_RENDER_STRIDE = Math.ceil(
+  (MAX_MASTER_SAMPLES - BASE_SAMPLE_WINDOW) /
+  (MAX_RENDER_DOTS - BASE_SAMPLE_WINDOW / BASE_RENDER_STRIDE)
+);
+const MAX_CANVAS_PIXELS = 16777216;
+const DEFAULT_DOT_TRANSPARENCY = 0.80;
+
+function targetDPR(){
+  // High-resolution backing canvas. Larger dots get more supersampling
+  // so edges, gradients, axes, and node surfaces stay crisp.
+  const base = (window.devicePixelRatio || 1);
+  const sizeBoost = 1 + Math.max(0, (+ps.value - 4)) / 8;
+  const detail = Math.min(phoneLayout.matches?2:6, Math.max(2.0, base * 1.35 * sizeBoost));
+  return Math.min(detail, Math.sqrt(MAX_CANVAS_PIXELS / Math.max(1, innerWidth * innerHeight)));
+}
+function resize(force=false){
+  const next = targetDPR();
+  if(!force && W===innerWidth && H===innerHeight && Math.abs((DPR||0)-next) < 0.05) return;
+  DPR = next;
+  W = innerWidth; H = innerHeight;
+  C.width = Math.round(W*DPR); C.height = Math.round(H*DPR);
+  C.style.width = W + "px"; C.style.height = H + "px";
+  X.setTransform(DPR,0,0,DPR,0,0);
+  X.imageSmoothingEnabled = true;
+  X.imageSmoothingQuality = "high";
+  dirty = true;
+}
+addEventListener("resize",()=>resize(true)); resize(true);
+
+function fact(n){ let a=1; for(let i=2;i<=n;i++) a*=i; return a; }
+function assocLaguerre(k,a,x){
+  let s=0;
+  for(let m=0;m<=k;m++){
+    const coeff = (((m&1)?-1:1) * fact(k+a)) / (fact(k-m)*fact(a+m)*fact(m));
+    s += coeff * x**m;
+  }
+  return s;
+}
+function radialR(n,l,r){
+  const rho = 2*r/n;
+  const norm = Math.sqrt((2/n)**3 * fact(n-l-1) / (2*n*fact(n+l)));
+  return norm * Math.exp(-rho/2) * rho**l * assocLaguerre(n-l-1, 2*l+1, rho);
+}
+function angularReal(type,x,y,z,r){
+  if(r < 1e-12) return type==="s" ? 1/Math.sqrt(4*Math.PI) : 0;
+
+  if(type==="s")  return 1/Math.sqrt(4*Math.PI);
+
+  if(type==="px") return Math.sqrt(3/(4*Math.PI)) * (x/r);
+  if(type==="py") return Math.sqrt(3/(4*Math.PI)) * (y/r);
+  if(type==="pz") return Math.sqrt(3/(4*Math.PI)) * (z/r);
+
+  if(type==="dz2")    return Math.sqrt(5/(16*Math.PI)) * ((3*z*z - r*r)/(r*r));
+  if(type==="dxy")    return Math.sqrt(15/(4*Math.PI))  * ((x*y)/(r*r));
+  if(type==="dxz")    return Math.sqrt(15/(4*Math.PI))  * ((x*z)/(r*r));
+  if(type==="dyz")    return Math.sqrt(15/(4*Math.PI))  * ((y*z)/(r*r));
+  if(type==="dx2-y2") return Math.sqrt(15/(16*Math.PI)) * ((x*x - y*y)/(r*r));
+
+  // Real cubic f harmonics. A common overall normalization factor is not
+  // required because each orbital's density cutoff is referenced to its
+  // own numerically determined angular maximum.
+  const r3 = r*r*r;
+  if(type==="fz3")       return z*(5*z*z - 3*r*r)/r3;
+  if(type==="fxz2")      return x*(5*z*z - r*r)/r3;
+  if(type==="fyz2")      return y*(5*z*z - r*r)/r3;
+  if(type==="fzx2-y2")   return z*(x*x - y*y)/r3;
+  if(type==="fxyz")      return x*y*z/r3;
+  if(type==="fxx2-3y2")  return x*(x*x - 3*y*y)/r3;
+  if(type==="fy3x2-y2")  return y*(3*x*x - y*y)/r3;
+
+  return 0;
+}
+
+const angularMaxCache = {};
+function angularMaxSq(type){
+  if(angularMaxCache[type] !== undefined) return angularMaxCache[type];
+
+  let maxSq = 0;
+  const nTheta = 181, nPhi = 360;
+  for(let i=0;i<nTheta;i++){
+    const theta = Math.PI*i/(nTheta-1);
+    const st = Math.sin(theta), ct = Math.cos(theta);
+    for(let j=0;j<nPhi;j++){
+      const phi = 2*Math.PI*j/nPhi;
+      const x = st*Math.cos(phi), y = st*Math.sin(phi), z = ct;
+      const a = angularReal(type,x,y,z,1);
+      const sq = a*a;
+      if(sq > maxSq) maxSq = sq;
+    }
+  }
+  angularMaxCache[type] = maxSq;
+  return maxSq;
+}
+function parseOrbital(s){
+  const n = parseInt(s[0],10), label = s.slice(1);
+  if(label==="s") return [n,0,"s"];
+  if(label[0]==="p") return [n,1,label];
+  if(label[0]==="d") return [n,2,label];
+  if(label[0]==="f") return [n,3,label];
+  return [n,0,"s"];
+}
+function mulberry32(a){
+  return function(){
+    let t = a += 0x6D2B79F5;
+    t = Math.imul(t ^ (t >>> 15), t | 1);
+    t ^= t + Math.imul(t ^ (t >>> 7), t | 61);
+    return ((t ^ (t >>> 14)) >>> 0) / 4294967296;
+  };
+}
+function hashString(str){
+  let h=2166136261>>>0;
+  for(let i=0;i<str.length;i++){
+    h ^= str.charCodeAt(i);
+    h = Math.imul(h, 16777619);
+  }
+  return h>>>0;
+}
+function gaussian(rand){
+  const u=Math.max(1e-12, 1-rand()), v=rand();
+  return Math.sqrt(-2*Math.log(u))*Math.cos(2*Math.PI*v);
+}
+function rot(x,y,z){
+  const cy=Math.cos(ry), sy=Math.sin(ry), cx=Math.cos(rx), sx=Math.sin(rx);
+  const x1 = cy*x + sy*z;
+  const z1 = -sy*x + cy*z;
+  return [x1, cx*y - sx*z1, sx*y + cx*z1];
+}
+function autoAxisFor(type){
+  if(type==="s") return "x";
+
+  if(type==="px") return "z";
+  if(type==="py") return "z";
+  if(type==="pz") return "x";
+
+  if(type==="dz2") return "x";
+  if(type==="dxy") return "z";
+  if(type==="dx2-y2") return "z";
+  if(type==="dxz") return "y";
+  if(type==="dyz") return "x";
+
+  // f-orbital defaults chosen to expose radial shells without cutting
+  // directly along the dominant lobe direction where possible.
+  if(type==="fz3") return "x";
+  if(type==="fxz2") return "y";
+  if(type==="fyz2") return "x";
+  if(type==="fzx2-y2") return "x";
+  if(type==="fxyz") return "z";
+  if(type==="fxx2-3y2") return "z";
+  if(type==="fy3x2-y2") return "z";
+
+  return "x";
+}
+function coordAlongAxis(p, axis){
+  if(axis==="x") return p[0];
+  if(axis==="y") return p[1];
+  return p[2];
+}
+function findPositiveRootsLaguerre(k,a){
+  if(k<=0) return [];
+  const roots = [];
+  const f = x => assocLaguerre(k,a,x);
+  let xmax = 50, step = 0.02;
+  let x0 = 1e-6, y0 = f(x0);
+  for(let x=x0+step; x<=xmax && roots.length<k; x+=step){
+    const y = f(x);
+    if(y===0 || y0===0 || y*y0 < 0){
+      let lo=x-step, hi=x;
+      for(let it=0; it<64; it++){
+        const mid=(lo+hi)/2, ym=f(mid);
+        if(Math.abs(ym)<1e-12){ lo=hi=mid; break; }
+        if(f(lo)*ym<=0) hi=mid; else lo=mid;
+      }
+      const root=(lo+hi)/2;
+      if(root>1e-6 && (roots.length===0 || Math.abs(root-roots[roots.length-1])>1e-3)) roots.push(root);
+    }
+    x0=x; y0=y;
+  }
+  return roots;
+}
+const validatedRadialNodes = {
+  "1,0": [],
+  "2,0": [2.0000000000],
+  "2,1": [],
+  "3,0": [1.9019237886, 7.0980762114],
+  "3,1": [6.0000000000],
+  "3,2": [],
+  "4,0": [1.8716444550, 6.6108145787, 15.5175409663],
+  "4,1": [5.5278640450, 14.4721359550],
+  "4,2": [12.0000000000],
+  "4,3": [],
+  "5,0": [1.8582298200, 6.4290875191, 14.3279468792, 27.3847357817],
+  "5,1": [5.3530406918, 13.2887928154, 26.3581664928],
+  "5,2": [10.8856217223, 24.1143782777],
+  "5,3": [20.0000000000],
+  "6,0": [1.8510925598, 6.3388978757, 13.8324994531, 25.1972009136, 42.7803091978],
+  "6,1": [5.2665649416, 12.7968175970, 24.1738220494, 41.7627954121],
+  "6,2": [10.4291865284, 21.9607386803, 39.6100747913],
+  "6,3": [18.0000000000, 36.0000000000],
+  "7,0": [1.8468384260, 6.2870493338, 13.5682453217, 24.2158579835, 39.3211365018, 61.7608724333],
+  "7,1": [5.2169423082, 12.5346683452, 23.1944870389, 38.3054630121, 60.7484392957],
+  "7,2": [10.1877522928, 21.0000000000, 36.1693862138, 58.6428614935],
+  "7,3": [17.1246266021, 32.6304646964, 55.2449087015]
+};
+
+function computeRadialNodeRadii(n,l){
+  const key = `${n},${l}`;
+  if(Object.prototype.hasOwnProperty.call(validatedRadialNodes, key)){
+    return validatedRadialNodes[key].slice();
+  }
+
+  const k = n-l-1;
+  const rhoRoots = findPositiveRootsLaguerre(k, 2*l+1);
+  return rhoRoots.map(rho => n*rho/2);
+}
+
+function computeDensityMax(n,l,type){
+  // Stable threshold reference: max_r R_nl(r)^2 times exact max angular factor.
+  const maxAng = angularMaxSq(type);
+  let maxR2 = 0;
+  const rMax = Math.max(12, 8*n*n);
+  const steps = 5000;
+  for(let i=0;i<=steps;i++){
+    const r = rMax*i/steps;
+    const val = radialR(n,l,r);
+    const d = val*val;
+    if(d>maxR2) maxR2 = d;
+  }
+  return maxR2 * maxAng;
+}
+
+function ensureMasterPoints(){
+  const [n,l,type] = parseOrbital(orb.value);
+  const key = `${orb.value}|master`;
+  if(masterKey === key && masterPoints.length === MAX_MASTER_SAMPLES){
+    return;
+  }
+
+  extent = 2.6*n*n;
+  nodeRadii = computeRadialNodeRadii(n,l);
+  densityMax = computeDensityMax(n,l,type);
+
+  const rand = mulberry32(hashString(key));
+  const scale = n*n*0.8;
+  const pts = [];
+
+  for(let i=0;i<MAX_MASTER_SAMPLES;i++){
+    let x,y,z;
+    if(i % 2 === 0){
+      x = gaussian(rand)*scale;
+      y = gaussian(rand)*scale;
+      z = gaussian(rand)*scale;
+    }else{
+      const u=rand(), ct=2*rand()-1, ph=2*Math.PI*rand();
+      const rr=extent*Math.cbrt(u), st=Math.sqrt(1-ct*ct);
+      x=rr*st*Math.cos(ph);
+      y=rr*st*Math.sin(ph);
+      z=rr*ct;
+    }
+    const r = Math.hypot(x,y,z);
+    const psi = radialR(n,l,r) * angularReal(type,x,y,z,r);
+    const dens = psi*psi;
+    pts.push([x,y,z,psi,dens]);
+  }
+
+  masterPoints = pts;
+  masterKey = key;
+}
+
+function refreshInfo(renderedCount, effectiveSamples){
+  const [n,l,type] = parseOrbital(orb.value);
+  cutv.textContent = cut.value + "%";
+  nv.textContent = (+num.value).toLocaleString();
+  psv.textContent = ps.value;
+  dotav.textContent = Number(dotAlpha.value).toFixed(2);
+  balloonav.textContent = Number(balloonAlpha.value).toFixed(2);
+  clipv.textContent = clip.value + "%";
+  nodeav.textContent = Number(nodeAlpha.value).toFixed(2);
+
+  info.innerHTML =
+    `n=${n}, l=${l}<br>` +
+    `Radial nodes: <b>${n-l-1}</b>${nodeRadii.length ? " at r ≈ " + nodeRadii.map(v=>v.toFixed(3)).join(", ") + " a₀" : ""}<br>` +
+    `Angular nodes: <b>${l}</b><br>` +
+    `Cutaway axis in use: <b>${usedAxis}</b><br>` +
+    (illustration.value==="dots"
+      ? `Source samples used: ${effectiveSamples.toLocaleString()}<br>Rendered dots: ${renderedCount.toLocaleString()}`
+      : `Illustration: <b>Balloon contours</b>`);
+}
+
+function buildCloud(){
+  ensureMasterPoints();
+
+  const N = Math.min(+num.value, MAX_MASTER_SAMPLES);
+  usedAxis = axisSel.value === "auto" ? autoAxisFor(parseOrbital(orb.value)[2]) : axisSel.value;
+  const cutPlane = currentCutPlane();
+  const cutoff = densityMax * (+cut.value/100)**4;
+
+  const filtered = [];
+  for(let i=0;i<N;i++){
+    const baseWindow = i < BASE_SAMPLE_WINDOW;
+    const offset = baseWindow ? i : i - BASE_SAMPLE_WINDOW;
+    const stride = baseWindow ? BASE_RENDER_STRIDE : EXTRA_RENDER_STRIDE;
+    if(Math.floor(offset / 2) % stride !== 0) continue;
+    const p = masterPoints[i];
+    if(p[4] >= cutoff && coordAlongAxis(p, usedAxis) < cutPlane){
+      filtered.push([p[0],p[1],p[2],p[3]]);
+    }
+  }
+
+  cloud = filtered;
+  refreshInfo(cloud.length, N);
+  dirty = true;
+}
+// ---------- Geometry and clipping ----------
+function currentCutPlane(){
+  const clipFrac = +clip.value/100;
+  return clipFrac === 0 ? Infinity : extent * (0.92 - 1.84*clipFrac);
+}
+function clipPolygonToHalfSpace(poly, axis, plane){
+  // Keep points with coord <= plane
+  function inside(p){ return coordAlongAxis(p, axis) <= plane + 1e-9; }
+  function interp(a,b){
+    const va = coordAlongAxis(a, axis), vb = coordAlongAxis(b, axis);
+    const t = (plane - va) / (vb - va);
+    return [
+      a[0] + t*(b[0]-a[0]),
+      a[1] + t*(b[1]-a[1]),
+      a[2] + t*(b[2]-a[2])
+    ];
+  }
+  let out = [];
+  for(let i=0;i<poly.length;i++){
+    const A = poly[i], B = poly[(i+1)%poly.length];
+    const Ain = inside(A), Bin = inside(B);
+    if(Ain && Bin){
+      out.push(B);
+    }else if(Ain && !Bin){
+      out.push(interp(A,B));
+    }else if(!Ain && Bin){
+      out.push(interp(A,B));
+      out.push(B);
+    }
+  }
+  return out;
+}
+function triangulatePolygon(poly){
+  const tris = [];
+  if(poly.length < 3) return tris;
+  for(let i=1;i<poly.length-1;i++){
+    tris.push([poly[0], poly[i], poly[i+1]]);
+  }
+  return tris;
+}
+function clipTriangles(tris){
+  if(+clip.value === 0) return tris;
+  const plane = currentCutPlane();
+  const axis = usedAxis;
+  const out = [];
+  for(const tri of tris){
+    const clipped = clipPolygonToHalfSpace(tri, axis, plane);
+    const tris2 = triangulatePolygon(clipped);
+    for(const t of tris2) out.push(t);
+  }
+  return out;
+}
+function proj(pt, S, cx, cy){
+  const r = rot(pt[0],pt[1],pt[2]);
+  return [cx + r[0]*S, cy - r[1]*S, r[2]];
+}
+function collectTriangleMeshItems(tris, fill, stroke){
+  const [n,S,cx,cy] = currentDrawState;
+  const clipped = clipTriangles(tris);
+  return clipped.map(tri => {
+    const pts = tri.map(p => proj(p,S,cx,cy));
+    const zavg = (pts[0][2]+pts[1][2]+pts[2][2])/3;
+    return {kind:"tri", pts, zavg, fill, stroke};
+  });
+}
+function drawTriangleItem(t){
+  X.beginPath();
+  X.moveTo(t.pts[0][0], t.pts[0][1]);
+  X.lineTo(t.pts[1][0], t.pts[1][1]);
+  X.lineTo(t.pts[2][0], t.pts[2][1]);
+  X.closePath();
+  X.fillStyle = t.fill;
+  X.fill();
+  if(t.stroke){
+    X.strokeStyle = t.stroke;
+    X.lineWidth = 0.55;
+    X.stroke();
+  }
+}
+
+function sphereTriangles(radius){
+  const nLat=28, nLon=56;
+  const tris=[];
+  for(let i=0;i<nLat;i++){
+    const th1 = Math.PI*i/nLat;
+    const th2 = Math.PI*(i+1)/nLat;
+    for(let j=0;j<nLon;j++){
+      const ph1 = 2*Math.PI*j/nLon;
+      const ph2 = 2*Math.PI*(j+1)/nLon;
+      const p00 = sph(radius, th1, ph1), p10 = sph(radius, th2, ph1), p01 = sph(radius, th1, ph2), p11 = sph(radius, th2, ph2);
+      tris.push([p00,p10,p11], [p00,p11,p01]);
+    }
+  }
+  return tris;
+}
+function sph(r,th,ph){
+  return [r*Math.sin(th)*Math.cos(ph), r*Math.sin(th)*Math.sin(ph), r*Math.cos(th)];
+}
+function planeFromNormalTriangles(nx,ny,nz,range){
+  const N=40, tris=[];
+  const len = Math.hypot(nx,ny,nz) || 1;
+  nx/=len; ny/=len; nz/=len;
+
+  // Choose a vector not parallel to the normal, then make an orthonormal basis.
+  let ax = Math.abs(nx) < 0.8 ? 1 : 0;
+  let ay = Math.abs(nx) < 0.8 ? 0 : 1;
+  let az = 0;
+
+  let ux = ny*az - nz*ay;
+  let uy = nz*ax - nx*az;
+  let uz = nx*ay - ny*ax;
+  const ul = Math.hypot(ux,uy,uz) || 1;
+  ux/=ul; uy/=ul; uz/=ul;
+
+  const vx = ny*uz - nz*uy;
+  const vy = nz*ux - nx*uz;
+  const vz = nx*uy - ny*ux;
+
+  function pt(i,j){
+    const a = range*(2*i/N-1), b = range*(2*j/N-1);
+    return [a*ux+b*vx, a*uy+b*vy, a*uz+b*vz];
+  }
+  for(let i=0;i<N;i++){
+    for(let j=0;j<N;j++){
+      const p00=pt(i,j), p10=pt(i+1,j), p01=pt(i,j+1), p11=pt(i+1,j+1);
+      tris.push([p00,p10,p11], [p00,p11,p01]);
+    }
+  }
+  return tris;
+}
+function planeTriangles(kind, range){
+  if(kind==="x0") return planeFromNormalTriangles(1,0,0,range);
+  if(kind==="y0") return planeFromNormalTriangles(0,1,0,range);
+  if(kind==="z0") return planeFromNormalTriangles(0,0,1,range);
+  if(kind==="x=y") return planeFromNormalTriangles(1,-1,0,range);
+  if(kind==="x=-y") return planeFromNormalTriangles(1,1,0,range);
+  return [];
+}
+function coneTrianglesRatio(range, rhoPerAbsZ){
+  const nZ=30, nPhi=60, tris=[];
+  const zMax = range / Math.sqrt(1 + rhoPerAbsZ*rhoPerAbsZ);
+  function pt(z,phi,sign){
+    const rho = rhoPerAbsZ*Math.abs(z);
+    return [rho*Math.cos(phi), rho*Math.sin(phi), sign*z];
+  }
+  for(const sign of [1,-1]){
+    for(let i=0;i<nZ;i++){
+      const z1 = zMax*i/nZ, z2 = zMax*(i+1)/nZ;
+      for(let j=0;j<nPhi;j++){
+        const p1 = 2*Math.PI*j/nPhi, p2 = 2*Math.PI*(j+1)/nPhi;
+        const a = pt(z1,p1,sign), b = pt(z2,p1,sign), c = pt(z1,p2,sign), d = pt(z2,p2,sign);
+        tris.push([a,b,d], [a,d,c]);
+      }
+    }
+  }
+  return tris;
+}
+function coneTriangles(range){
+  // d_z² nodes: x²+y² = 2z²
+  return coneTrianglesRatio(range, Math.sqrt(2));
+}
+let currentDrawState=[1,1,0,0];
+
+function drawBalloon(x,y,radius,sign,alpha){
+  const transparency = +dotAlpha.value;
+  if(transparency >= 1) return;
+  const opacity = a => {
+    if(transparency === DEFAULT_DOT_TRANSPARENCY) return a;
+    return transparency < DEFAULT_DOT_TRANSPARENCY
+      ? 1 - (1-a) * transparency / DEFAULT_DOT_TRANSPARENCY
+      : a * (1-transparency) / (1-DEFAULT_DOT_TRANSPARENCY);
+  };
+  const detailScale = Math.min(1, (1-transparency)/(1-DEFAULT_DOT_TRANSPARENCY));
+  const edgeAlpha = Math.min(1, alpha*0.9);
+  const coreAlpha = Math.min(1, alpha*1.18);
+  const hiAlpha   = Math.min(1, alpha*0.95);
+  const mono = !useColours.checked;
+
+  const g = X.createRadialGradient(
+    x - radius*0.24, y - radius*0.26, Math.max(0.6, radius*0.05),
+    x, y, radius
+  );
+
+  if(mono){
+    // Preserve wavefunction sign in monochrome using light vs dark grayscale.
+    if(sign >= 0){
+      g.addColorStop(0.00, `rgba(255,255,255,${opacity(hiAlpha)})`);
+      g.addColorStop(0.18, `rgba(230,230,230,${opacity(coreAlpha)})`);
+      g.addColorStop(0.50, `rgba(180,180,180,${opacity(alpha)})`);
+      g.addColorStop(0.82, `rgba(120,120,120,${opacity(alpha*0.72)})`);
+      g.addColorStop(1.00, `rgba(75,75,75,${opacity(alpha*0.08)})`);
+    }else{
+      g.addColorStop(0.00, `rgba(210,210,210,${opacity(hiAlpha)})`);
+      g.addColorStop(0.18, `rgba(155,155,155,${opacity(coreAlpha)})`);
+      g.addColorStop(0.50, `rgba(95,95,95,${opacity(alpha)})`);
+      g.addColorStop(0.82, `rgba(45,45,45,${opacity(alpha*0.72)})`);
+      g.addColorStop(1.00, `rgba(10,10,10,${opacity(alpha*0.08)})`);
+    }
+  }else if(sign >= 0){
+    g.addColorStop(0.00, `rgba(255,244,234,${opacity(hiAlpha)})`);
+    g.addColorStop(0.16, `rgba(255,196,170,${opacity(coreAlpha)})`);
+    g.addColorStop(0.46, `rgba(255,124,92,${opacity(alpha)})`);
+    g.addColorStop(0.80, `rgba(208,64,44,${opacity(alpha*0.72)})`);
+    g.addColorStop(0.96, `rgba(128,24,15,${opacity(alpha*0.36)})`);
+    g.addColorStop(1.00, `rgba(92,16,10,${opacity(alpha*0.08)})`);
+  }else{
+    g.addColorStop(0.00, `rgba(245,250,255,${opacity(hiAlpha)})`);
+    g.addColorStop(0.16, `rgba(196,224,255,${opacity(coreAlpha)})`);
+    g.addColorStop(0.46, `rgba(98,168,255,${opacity(alpha)})`);
+    g.addColorStop(0.80, `rgba(46,96,216,${opacity(alpha*0.72)})`);
+    g.addColorStop(0.96, `rgba(18,42,138,${opacity(alpha*0.36)})`);
+    g.addColorStop(1.00, `rgba(12,25,96,${opacity(alpha*0.08)})`);
+  }
+
+  X.fillStyle = g;
+  X.beginPath();
+  X.arc(x,y,radius,0,Math.PI*2);
+  X.fill();
+
+  X.lineWidth = Math.max(0.6, radius*0.10);
+  X.strokeStyle = mono
+    ? `rgba(235,235,235,${(edgeAlpha*0.20)*detailScale})`
+    : (sign >= 0
+      ? `rgba(255,235,225,${(edgeAlpha*0.22)*detailScale})`
+      : `rgba(235,244,255,${(edgeAlpha*0.22)*detailScale})`);
+  X.beginPath();
+  X.arc(x,y,Math.max(0.1, radius - X.lineWidth*0.5),0,Math.PI*2);
+  X.stroke();
+
+  const hx = x - radius*0.28, hy = y - radius*0.30, hr = Math.max(0.8, radius*0.26);
+  const hg = X.createRadialGradient(hx, hy, 0, hx, hy, hr);
+  hg.addColorStop(0.0, `rgba(255,255,255,${(alpha*0.38)*detailScale})`);
+  hg.addColorStop(0.6, `rgba(255,255,255,${(alpha*0.10)*detailScale})`);
+  hg.addColorStop(1.0, `rgba(255,255,255,0)`);
+  X.fillStyle = hg;
+  X.beginPath();
+  X.arc(hx,hy,hr,0,Math.PI*2);
+  X.fill();
+}
+
+function radialNodeSurfaceItems(){
+  const transparency = +nodeAlpha.value;
+  const a = Math.max(0, Math.min(1, 1 - transparency));
+  if(a === 0) return [];
+  const mono = !useColours.checked;
+  const fill = mono ? `rgba(170,170,170,${a})` : `rgba(255,211,77,${a})`;
+  const stroke = mono ? `rgba(220,220,220,${Math.min(1,0.95*a)})` : `rgba(255,225,120,${Math.min(1,0.95*a)})`;
+  let items = [];
+  for(const r of nodeRadii){
+    items.push(...collectTriangleMeshItems(
+      sphereTriangles(r),
+      fill,
+      stroke
+    ));
+  }
+  return items;
+}
+function angularNodeSurfaceItems(type){
+  const R = extent*0.72;
+  const transparency = +nodeAlpha.value;
+  const a = Math.max(0, Math.min(1, 1 - transparency));
+  if(a === 0) return [];
+  const mono = !useColours.checked;
+  const fill = mono ? `rgba(120,120,120,${a})` : `rgba(105,255,178,${a})`;
+  const stroke = mono ? `rgba(205,205,205,${Math.min(1,0.95*a)})` : `rgba(160,255,215,${Math.min(1,0.95*a)})`;
+  let items = [];
+
+  const addPlane = (nx,ny,nz,scale=1) =>
+    items.push(...collectTriangleMeshItems(planeFromNormalTriangles(nx,ny,nz,R*scale), fill, stroke));
+
+  if(type==="s") return items;
+
+  if(type==="px") addPlane(1,0,0);
+  if(type==="py") addPlane(0,1,0);
+  if(type==="pz") addPlane(0,0,1);
+
+  if(type==="dz2") items.push(...collectTriangleMeshItems(coneTrianglesRatio(extent*0.9, Math.sqrt(2)), fill, stroke));
+  if(type==="dxy"){ addPlane(1,0,0); addPlane(0,1,0); }
+  if(type==="dxz"){ addPlane(1,0,0); addPlane(0,0,1); }
+  if(type==="dyz"){ addPlane(0,1,0); addPlane(0,0,1); }
+  if(type==="dx2-y2"){ addPlane(1,-1,0,0.84); addPlane(1,1,0,0.84); }
+
+  // f_z^3 ∝ z(5z²−3r²): z=0 plus x²+y²=(2/3)z²
+  if(type==="fz3"){
+    addPlane(0,0,1);
+    items.push(...collectTriangleMeshItems(coneTrianglesRatio(extent*0.9, Math.sqrt(2/3)), fill, stroke));
+  }
+
+  // f_xz² ∝ x(5z²−r²): x=0 plus x²+y²=4z²
+  if(type==="fxz2"){
+    addPlane(1,0,0);
+    items.push(...collectTriangleMeshItems(coneTrianglesRatio(extent*0.9, 2), fill, stroke));
+  }
+
+  // f_yz² ∝ y(5z²−r²): y=0 plus x²+y²=4z²
+  if(type==="fyz2"){
+    addPlane(0,1,0);
+    items.push(...collectTriangleMeshItems(coneTrianglesRatio(extent*0.9, 2), fill, stroke));
+  }
+
+  // f_z(x²−y²): z=0, x=y, x=−y
+  if(type==="fzx2-y2"){
+    addPlane(0,0,1);
+    addPlane(1,-1,0,0.84);
+    addPlane(1,1,0,0.84);
+  }
+
+  // f_xyz: x=0, y=0, z=0
+  if(type==="fxyz"){
+    addPlane(1,0,0);
+    addPlane(0,1,0);
+    addPlane(0,0,1);
+  }
+
+  // f_x(x²−3y²): x=0, x=√3 y, x=−√3 y
+  if(type==="fxx2-3y2"){
+    addPlane(1,0,0);
+    addPlane(1,-Math.sqrt(3),0,0.82);
+    addPlane(1, Math.sqrt(3),0,0.82);
+  }
+
+  // f_y(3x²−y²): y=0, y=√3 x, y=−√3 x
+  if(type==="fy3x2-y2"){
+    addPlane(0,1,0);
+    addPlane(-Math.sqrt(3),1,0,0.82);
+    addPlane( Math.sqrt(3),1,0,0.82);
+  }
+
+  return items;
+}
+
+// Continuous constant-density surfaces, with each radial shell resolved separately.
+let contourCacheKey = "", contourMesh = [];
+function radialEvaluator(n,l){
+  const k=n-l-1, a=2*l+1;
+  const norm=Math.sqrt((2/n)**3 * fact(k)/(2*n*fact(n+l)));
+  const coeff=Array.from({length:k+1},(_,m)=>((m&1)?-1:1)*fact(k+a)/(fact(k-m)*fact(a+m)*fact(m)));
+  return r=>{
+    const rho=2*r/n;
+    let polynomial=coeff[k];
+    for(let m=k-1;m>=0;m--) polynomial=polynomial*rho+coeff[m];
+    return norm*Math.exp(-rho/2)*rho**l*polynomial;
+  };
+}
+function normalize3(v){
+  const length=Math.hypot(...v)||1;
+  return v.map(x=>x/length);
+}
+function buildContourMesh(){
+  const key=orb.value+"|"+cut.value;
+  if(key===contourCacheKey) return contourMesh;
+  const [n,l,type]=parseOrbital(orb.value), radial=radialEvaluator(n,l);
+  const amplitude=Math.sqrt(densityMax)*(+cut.value/100)**2;
+  const angularMaximum=Math.sqrt(angularMaxSq(type));
+  const boundaries=[0,...nodeRadii,Math.max(12,8*n*n)];
+  const nLat=40,nLon=80, directions=[], angularTris=[];
+  const north={u:[0,0,1],id:0},south={u:[0,0,-1],id:(nLat+1)*nLon};
+  function direction(i,j){
+    if(i===0) return north;
+    if(i===nLat) return south;
+    return directions[i*nLon+(j%nLon)];
+  }
+  for(let i=1;i<nLat;i++)for(let j=0;j<nLon;j++){
+    directions[i*nLon+j]={u:sph(1,Math.PI*i/nLat,2*Math.PI*j/nLon),id:i*nLon+j};
+  }
+  for(const p of [north,south,...directions.filter(Boolean)]){
+    p.a=angularReal(type,...p.u,1);
+  }
+  for(let i=0;i<nLat;i++)for(let j=0;j<nLon;j++){
+    const a=direction(i,j),b=direction(i+1,j),c=direction(i,j+1),d=direction(i+1,j+1);
+    if(a!==c) angularTris.push([a,b,c]);
+    if(b!==d) angularTris.push([c,b,d]);
+  }
+  const mesh=[];
+  for(let band=0;band<boundaries.length-1;band++){
+    const lo=boundaries[band],hi=boundaries[band+1];
+    let left=lo,right=hi;
+    for(let it=0;it<64;it++){
+      const a=left+(right-left)/3,b=right-(right-left)/3;
+      if(Math.abs(radial(a))<Math.abs(radial(b))) left=a;else right=b;
+    }
+    const peakR=(left+right)/2;
+    const peak=Math.abs(radial(peakR));
+    if(peak*angularMaximum<amplitude) continue;
+    const angularFloor=amplitude/peak, radialSign=Math.sign(radial(peakR));
+    const roots=new Map(),points=new Map(),intersections=new Map();
+    function radii(angular){
+      const target=amplitude/Math.abs(angular);
+      const rootKey=target.toPrecision(13);
+      if(roots.has(rootKey)) return roots.get(rootKey);
+      function bisect(a,b,rising){
+        for(let it=0;it<36;it++){
+          const mid=(a+b)/2;
+          if((Math.abs(radial(mid))<target)===rising) a=mid;else b=mid;
+        }
+        return (a+b)/2;
+      }
+      const result=target>=peak*(1-1e-10)?[peakR,peakR]:[
+        l===0&&band===0?0:bisect(lo,peakR,true),bisect(peakR,hi,false)
+      ];
+      roots.set(rootKey,result);return result;
+    }
+    function surfacePoint(p,sheet,phase){
+      const pointKey=p.id+"|"+sheet;
+      if(points.has(pointKey)) return points.get(pointKey);
+      const r=radii(p.a)[sheet],v=p.u.map(x=>x*r);
+      const h=Math.max(1e-6,n*n*1e-5);
+      const psi=xyz=>{const rr=Math.hypot(...xyz);return radial(rr)*angularReal(type,...xyz,rr);};
+      const gradient=v.map((_,axis)=>{
+        const a=v.slice(),b=v.slice();a[axis]+=h;b[axis]-=h;
+        return -phase*(psi(a)-psi(b))/(2*h);
+      });
+      const point={v,normal:normalize3(gradient)};
+      points.set(pointKey,point);return point;
+    }
+    function crossing(a,b,angularSign){
+      const id=Math.min(a.id,b.id)+":"+Math.max(a.id,b.id)+":"+angularSign;
+      if(intersections.has(id)) return intersections.get(id);
+      let left=0,right=1;
+      const startsInside=angularSign*a.a>=angularFloor;
+      let u;
+      for(let it=0;it<36;it++){
+        const t=(left+right)/2;
+        u=normalize3(a.u.map((x,i)=>x+(b.u[i]-x)*t));
+        const inside=angularSign*angularReal(type,...u,1)>=angularFloor;
+        if(inside===startsInside) left=t;else right=t;
+      }
+      u=normalize3(a.u.map((x,i)=>x+(b.u[i]-x)*(left+right)/2));
+      const result={u,a:angularSign*angularFloor,id};
+      intersections.set(id,result);return result;
+    }
+    function angularClip(tri,angularSign){
+      const out=[];
+      for(let i=0;i<3;i++){
+        const a=tri[i],b=tri[(i+1)%3];
+        const ain=angularSign*a.a>=angularFloor,bin=angularSign*b.a>=angularFloor;
+        if(ain) out.push(a);
+        if(ain!==bin) out.push(crossing(a,b,angularSign));
+      }
+      return out;
+    }
+    for(const angularSign of [1,-1]){
+      const phase=angularSign*radialSign;
+      for(const tri of angularTris){
+        const polygon=angularClip(tri,angularSign);
+        if(polygon.length<3) continue;
+        for(const sheet of l===0&&band===0?[1]:[0,1]){
+          const vertices=polygon.map(p=>surfacePoint(p,sheet,phase));
+          for(let i=1;i<vertices.length-1;i++){
+            const t=[vertices[0],vertices[i],vertices[i+1]];
+            const a=t[1].v.map((v,j)=>v-t[0].v[j]),b=t[2].v.map((v,j)=>v-t[0].v[j]);
+            const area=Math.hypot(a[1]*b[2]-a[2]*b[1],a[2]*b[0]-a[0]*b[2],a[0]*b[1]-a[1]*b[0]);
+            if(area>1e-12) mesh.push({vertices:t,phase});
+          }
+        }
+      }
+    }
+  }
+  contourMesh=mesh;contourCacheKey=key;return mesh;
+}
+function contourSurfaceItems(){
+  const opacity=1-(+balloonAlpha.value);
+  if(opacity<=0) return [];
+  const [,S,cx,cy]=currentDrawState,plane=currentCutPlane(),items=[];
+  function intersection(a,b){
+    const t=(plane-coordAlongAxis(a.v,usedAxis))/(coordAlongAxis(b.v,usedAxis)-coordAlongAxis(a.v,usedAxis));
+    return {v:a.v.map((x,i)=>x+(b.v[i]-x)*t),normal:normalize3(a.normal.map((x,i)=>x+(b.normal[i]-x)*t))};
+  }
+  function clip(tri){
+    if(!Number.isFinite(plane)) return tri;
+    const out=[];
+    for(let i=0;i<tri.length;i++){
+      const a=tri[i],b=tri[(i+1)%tri.length];
+      const ain=coordAlongAxis(a.v,usedAxis)<=plane,bin=coordAlongAxis(b.v,usedAxis)<=plane;
+      if(ain) out.push(a);
+      if(ain!==bin) out.push(intersection(a,b));
+    }
+    return out;
+  }
+  for(const face of buildContourMesh()){
+    const polygon=clip(face.vertices);
+    for(let i=1;i<polygon.length-1;i++){
+      const tri=[polygon[0],polygon[i],polygon[i+1]];
+      const pts=tri.map(p=>proj(p.v,S,cx,cy));
+      let normal=normalize3(tri[0].normal.map((_,j)=>tri.reduce((sum,p)=>sum+p.normal[j],0)));
+      normal=rot(...normal);
+      if(normal[2]<0) normal=normal.map(x=>-x);
+      const diffuse=Math.max(0,normal[0]*-.30+normal[1]*.45+normal[2]*.84);
+      const specular=Math.pow(Math.max(0,normal[0]*-.16+normal[1]*.24+normal[2]*.96),22);
+      const base=useColours.checked?(face.phase>0?[255,96,72]:[61,156,255]):(face.phase>0?[215,215,215]:[110,110,110]);
+      const rgb=base.map(c=>Math.round(Math.min(255,c*(.40+.60*diffuse)+105*specular)));
+      const fill=`rgba(${rgb.join(",")},${opacity})`;
+      items.push({kind:"tri",pts,zavg:pts.reduce((sum,p)=>sum+p[2],0)/3,fill,stroke:null,
+        normals:tri.map(p=>rot(...p.normal)),colour:[...base.map(c=>c/255),opacity]});
+    }
+  }
+  return items;
+}
+function syncIllustrationControls(){
+  const balloon=illustration.value==="balloon";
+  document.getElementById("dotControls").hidden=balloon;
+  document.getElementById("balloonControls").hidden=!balloon;
+  const accelerated=balloon&&initBalloonRenderer();
+  document.getElementById("balloonCanvas").hidden=!accelerated;
+  applyBackground();
+}
+
+let balloonGL=null;
+function initBalloonRenderer(){
+  if(balloonGL) return true;
+  const canvas=document.getElementById("balloonCanvas");
+  try{
+    const gl=canvas.getContext("webgl",{alpha:true,antialias:true,premultipliedAlpha:true});
+    if(!gl) return false;
+    const vertexSource=`
+      attribute vec2 aPosition;
+      attribute vec3 aNormal;
+      attribute vec4 aColour;
+      uniform vec2 uResolution;
+      varying vec3 vNormal;
+      varying vec4 vColour;
+      void main(){
+        gl_Position=vec4(aPosition.x/uResolution.x*2.0-1.0,1.0-aPosition.y/uResolution.y*2.0,0.0,1.0);
+        vNormal=aNormal;
+        vColour=aColour;
+      }`;
+    const fragmentSource=`
+      precision mediump float;
+      varying vec3 vNormal;
+      varying vec4 vColour;
+      void main(){
+        vec3 colour=vColour.rgb;
+        if(dot(vNormal,vNormal)>0.01){
+          vec3 normal=normalize(vNormal);
+          if(normal.z<0.0) normal=-normal;
+          float diffuse=max(0.0,dot(normal,normalize(vec3(-0.30,0.45,0.84))));
+          float specular=pow(max(0.0,dot(normal,normalize(vec3(-0.16,0.24,0.96)))),22.0);
+          colour=clamp(colour*(0.40+0.60*diffuse)+vec3(0.412)*specular,0.0,1.0);
+        }
+        gl_FragColor=vec4(colour,vColour.a);
+      }`;
+    function compile(type,source){
+      const shader=gl.createShader(type);gl.shaderSource(shader,source);gl.compileShader(shader);
+      if(!gl.getShaderParameter(shader,gl.COMPILE_STATUS)) throw Error("Shader unavailable");
+      return shader;
+    }
+    const program=gl.createProgram();
+    gl.attachShader(program,compile(gl.VERTEX_SHADER,vertexSource));
+    gl.attachShader(program,compile(gl.FRAGMENT_SHADER,fragmentSource));
+    gl.linkProgram(program);
+    if(!gl.getProgramParameter(program,gl.LINK_STATUS)) return false;
+    balloonGL={gl,canvas,program,buffer:gl.createBuffer(),
+      position:gl.getAttribLocation(program,"aPosition"),normal:gl.getAttribLocation(program,"aNormal"),
+      colour:gl.getAttribLocation(program,"aColour"),resolution:gl.getUniformLocation(program,"uResolution")};
+    return true;
+  }catch(error){return false;}
+}
+function renderBalloonTriangles(items){
+  const {gl,canvas,program,buffer,position,normal,colour,resolution}=balloonGL;
+  if(canvas.width!==C.width||canvas.height!==C.height){canvas.width=C.width;canvas.height=C.height;}
+  gl.viewport(0,0,canvas.width,canvas.height);
+  gl.clearColor(0,0,0,0);gl.clear(gl.COLOR_BUFFER_BIT);
+  if(!items.length) return;
+  const vertices=new Float32Array(items.length*27),colours=new Map();
+  let offset=0;
+  for(const item of items){
+    let rgba=item.colour;
+    if(!rgba){
+      if(!colours.has(item.fill)){
+        const values=item.fill.match(/[\d.]+/g).map(Number);
+        colours.set(item.fill,[values[0]/255,values[1]/255,values[2]/255,values[3]]);
+      }
+      rgba=colours.get(item.fill);
+    }
+    for(let i=0;i<3;i++){
+      vertices[offset++]=item.pts[i][0];vertices[offset++]=item.pts[i][1];
+      const vector=item.normals?item.normals[i]:[0,0,0];
+      for(const v of vector) vertices[offset++]=v;
+      for(const v of rgba) vertices[offset++]=v;
+    }
+  }
+  gl.useProgram(program);gl.bindBuffer(gl.ARRAY_BUFFER,buffer);
+  gl.bufferData(gl.ARRAY_BUFFER,vertices,gl.DYNAMIC_DRAW);
+  for(const [attribute,size,start] of [[position,2,0],[normal,3,8],[colour,4,20]]){
+    gl.enableVertexAttribArray(attribute);gl.vertexAttribPointer(attribute,size,gl.FLOAT,false,36,start);
+  }
+  gl.uniform2f(resolution,W,H);
+  gl.disable(gl.DEPTH_TEST);gl.disable(gl.CULL_FACE);gl.enable(gl.BLEND);
+  gl.blendFuncSeparate(gl.SRC_ALPHA,gl.ONE_MINUS_SRC_ALPHA,gl.ONE,gl.ONE_MINUS_SRC_ALPHA);
+  gl.drawArrays(gl.TRIANGLES,0,items.length*3);
+}
+
+// ---------- Main draw ----------
+function draw(){
+  if(!dirty){
+    requestAnimationFrame(draw);
+    return;
+  }
+  X.clearRect(0,0,W,H);
+
+  const [n,,type] = parseOrbital(orb.value);
+  const viewport=drawingViewport();
+  const S = Math.min(viewport.width,viewport.height)/(5.8*n*n) * zoom;
+  const cx=viewport.cx,cy=viewport.cy;
+  const baseSize = +ps.value;
+  currentDrawState=[n,S,cx,cy];
+
+  // Build a single depth-sorted render queue so node surfaces and dots respect
+  // front/back perspective relative to each other.
+  let items = [];
+
+  if(showRadial.checked) items.push(...radialNodeSurfaceItems());
+  if(showAngular.checked) items.push(...angularNodeSurfaceItems(type));
+
+  if(illustration.value==="balloon") items.push(...contourSurfaceItems());
+  const visibleDots = illustration.value==="dots" && +dotAlpha.value < 1 ? cloud : [];
+  for(const p of visibleDots){
+    const rr = rot(p[0],p[1],p[2]);
+    const zNorm = Math.max(-1, Math.min(1, rr[2]/extent));
+    const radius = Math.max(1.1, baseSize*(0.58 + 0.78*(zNorm+1)/2));
+    const alpha = 0.10 + 0.19*(zNorm+1)/2;
+    items.push({
+      kind:"dot",
+      zavg: rr[2],
+      x: cx + rr[0]*S,
+      y: cy - rr[1]*S,
+      radius,
+      sign: p[3],
+      alpha
+    });
+  }
+
+  items.sort((a,b)=>a.zavg-b.zavg);
+
+  if(illustration.value==="balloon"&&balloonGL){
+    renderBalloonTriangles(items);
+  }else for(const item of items){
+    if(item.kind==="tri"){
+      drawTriangleItem(item);
+    }else{
+      drawBalloon(item.x, item.y, item.radius, item.sign, item.alpha);
+    }
+  }
+
+  if(showAxes.checked){
+    const monoAxes = !useColours.checked;
+    const axisMono = bgMode.value === "white" ? "#202020" : "#e8e8e8";
+    const axisLength = extent * 0.65;
+    const axes = monoAxes
+      ? [[axisLength,0,0,"X",axisMono], [0,axisLength,0,"Y",axisMono], [0,0,axisLength,"Z",axisMono]]
+      : [[axisLength,0,0,"X","#ff4d4d"], [0,axisLength,0,"Y","#21c45b"], [0,0,axisLength,"Z","#3d8cff"]];
+    X.lineWidth = 3.2;
+    X.font = "17px Arial";
+    for(const a of axes){
+      const e = rot(a[0],a[1],a[2]);
+      X.strokeStyle = a[4];
+      X.beginPath();
+      X.moveTo(cx,cy);
+      X.lineTo(cx + e[0]*S, cy - e[1]*S);
+      X.stroke();
+      X.fillStyle = a[4];
+      X.fillText(a[3], cx + e[0]*S + 7, cy - e[1]*S - 7);
+    }
+  }
+
+  dirty = false;
+  requestAnimationFrame(draw);
+}
+
+function applyColourMode(){
+  const mono = !useColours.checked;
+  const swatches = document.querySelectorAll(".sw");
+  if(swatches.length >= 2){
+    if(mono){
+      swatches[0].style.background = "#cfcfcf";
+      swatches[1].style.background = "#555555";
+    }else{
+      swatches[0].style.background = "#ff6048";
+      swatches[1].style.background = "#3d9cff";
+    }
+  }
+  dirty = true;
+}
+
+function applyBackground(){
+  const white = bgMode.value === "white";
+  document.documentElement.style.background = white ? "#ffffff" : "#070a10";
+  document.body.style.background = white ? "#ffffff" : "#070a10";
+  C.style.background = illustration.value==="balloon"&&balloonGL?"transparent":(white ? "#ffffff" : "#070a10");
+  document.getElementById("balloonCanvas").style.background=white?"#ffffff":"#070a10";
+  dirty = true;
+}
+
+// ---------- Events ----------
+function rebuildIfNeeded(){
+  const key = `${illustration.value}|${orb.value}|${cut.value}|${num.value}|${clip.value}|${axisSel.value}`;
+  if(key !== cacheKey){
+    cacheKey = key;
+    if(illustration.value==="dots"){
+      buildCloud();
+    }else{
+      const [n,l,type]=parseOrbital(orb.value);
+      extent=2.6*n*n;
+      nodeRadii=computeRadialNodeRadii(n,l);
+      densityMax=computeDensityMax(n,l,type);
+      usedAxis=axisSel.value==="auto"?autoAxisFor(type):axisSel.value;
+      refreshInfo(0,+num.value);
+      dirty=true;
+    }
+  }else{
+    dirty = true;
+  }
+}
+
+let phoneControlsOpen=false;
+function syncPhoneControls(){
+  controlsPanel.classList.toggle("mobile-open",phoneControlsOpen);
+  controlsPanel.hidden=phoneLayout.matches&&!phoneControlsOpen;
+  controlsToggle.hidden=!phoneLayout.matches;
+  controlsToggle.textContent=phoneControlsOpen?"Hide controls":"Controls";
+  controlsToggle.setAttribute("aria-expanded",String(!controlsPanel.hidden));
+  dirty=true;
+}
+controlsToggle.onclick=()=>{
+  phoneControlsOpen=!phoneControlsOpen;
+  syncPhoneControls();
+};
+if(phoneLayout.addEventListener) phoneLayout.addEventListener("change",syncPhoneControls);
+else phoneLayout.addListener(syncPhoneControls);
+addEventListener("keydown",e=>{
+  if(e.key==="Escape"&&phoneLayout.matches&&phoneControlsOpen){
+    phoneControlsOpen=false;syncPhoneControls();controlsToggle.focus();
+  }
+});
+function drawingViewport(){
+  if(!phoneLayout.matches) return {width:W,height:H,cx:W*.60,cy:H*.54};
+  const lowerEdge=Math.min(H-76,controlsToggle.getBoundingClientRect().top-12);
+  const height=Math.max(48,Math.min(lowerEdge,controlsPanel.hidden?lowerEdge:controlsPanel.getBoundingClientRect().top-12));
+  return {width:W,height,cx:W*.5,cy:height*.5};
+}
+const scenePointers=new Map();
+let pinchDistance=0;
+function pointerDistance(){
+  const [a,b]=[...scenePointers.values()];
+  return Math.hypot(a.x-b.x,a.y-b.y);
+}
+C.onpointerdown=e=>{
+  if(e.button!==0||scenePointers.size>=2) return;
+  scenePointers.set(e.pointerId,{x:e.clientX,y:e.clientY});
+  C.setPointerCapture(e.pointerId);
+  if(scenePointers.size===1){
+    activePointerId=e.pointerId;drag=true;lx=e.clientX;ly=e.clientY;
+  }else{
+    activePointerId=null;drag=false;pinchDistance=pointerDistance();
+  }
+};
+function endScenePointer(e){
+  if(!scenePointers.has(e.pointerId)) return;
+  scenePointers.delete(e.pointerId);
+  if(C.hasPointerCapture(e.pointerId)) C.releasePointerCapture(e.pointerId);
+  pinchDistance=0;
+  if(scenePointers.size===1){
+    const [id,p]=[...scenePointers.entries()][0];
+    activePointerId=id;drag=true;lx=p.x;ly=p.y;
+  }else{
+    activePointerId=null;drag=false;
+  }
+}
+C.onpointerup=endScenePointer;
+C.onpointercancel=endScenePointer;
+C.onlostpointercapture=endScenePointer;
+C.onpointermove=e=>{
+  if(!scenePointers.has(e.pointerId)) return;
+  scenePointers.set(e.pointerId,{x:e.clientX,y:e.clientY});
+  if(scenePointers.size===2){
+    const distance=pointerDistance();
+    if(pinchDistance>0){zoom=Math.max(.3,Math.min(4,zoom*distance/pinchDistance));dirty=true;}
+    pinchDistance=distance;
+  }else if(drag&&e.pointerId===activePointerId){
+    ry+=(e.clientX-lx)*.008;rx+=(e.clientY-ly)*.008;
+    lx=e.clientX;ly=e.clientY;dirty=true;
+  }
+};
+
+C.addEventListener("wheel", e => {
+  e.preventDefault();
+  const delta = e.deltaY * (e.deltaMode === 1 ? 16 : e.deltaMode === 2 ? H : 1);
+  zoom *= Math.exp(-delta*0.001);
+  zoom = Math.max(0.3, Math.min(4, zoom));
+  dirty = true;
+}, {passive:false});
+
+resetBtn.onclick = () => { rx = -0.48; ry = 0.82; zoom = 1; dirty = true; };
+
+illustration.onchange = () => {syncIllustrationControls();rebuildIfNeeded();};
+balloonAlpha.oninput = () => {balloonav.textContent=Number(balloonAlpha.value).toFixed(2);dirty=true;};
+orb.onchange = rebuildIfNeeded;
+cut.oninput = rebuildIfNeeded;
+num.oninput = rebuildIfNeeded;
+clip.oninput = rebuildIfNeeded;
+axisSel.onchange = rebuildIfNeeded;
+
+// These should redraw only; they must not rebuild the cloud.
+ps.oninput = () => {
+  psv.textContent = ps.value;
+  resize(true);   // raise backing resolution for larger dots
+  dirty = true;
+};
+dotAlpha.oninput = () => {
+  dotav.textContent = Number(dotAlpha.value).toFixed(2);
+  dirty = true;
+};
+bgMode.onchange = () => { applyBackground(); applyColourMode(); };
+useColours.onchange = applyColourMode;
+showAxes.onchange = () => { dirty = true; };
+showRadial.onchange = () => { dirty = true; };
+showAngular.onchange = () => { dirty = true; };
+nodeAlpha.oninput = () => {
+  nodeav.textContent = Number(nodeAlpha.value).toFixed(2);
+  dirty = true;
+};
+
+syncPhoneControls();
+syncIllustrationControls();
+applyBackground();
+applyColourMode();
+rebuildIfNeeded();
+draw();
+    </script>
+  </body>
+</html>

@@ -1,0 +1,253 @@
+// Team and themed publication highlights. Empty photo paths retain portrait placeholders.
+window.siteContent = {
+  "people": [
+    {
+      "name": "Sam Netzke",
+      "role": "Postdoctoral Fellow",
+      "group": "Researchers",
+      "focus": "Compact ultrafast electron diffraction",
+      "photo": "assets/images/people/sam.jpg"
+    },
+    {
+      "name": "Tyler Lott",
+      "role": "Postdoctoral Fellow",
+      "group": "Researchers",
+      "focus": "Nanofluidics and liquid-cell electron microscopy",
+      "photo": "assets/images/people/tyler.jpg"
+    },
+    {
+      "name": "Saadia Benourdja",
+      "role": "Research Associate · Part-time",
+      "group": "Researchers",
+      "focus": "Ultrafast Electron Imaging Laboratory",
+      "photo": ""
+    },
+    {
+      "name": "Ida Rezaei",
+      "role": "Ph.D. Student · Co-supervised with Schulz",
+      "group": "Students",
+      "focus": "Metasurfaces for compact hyperspectral cathodoluminescence",
+      "photo": ""
+    },
+    {
+      "name": "Grant Brassem",
+      "role": "Ph.D. Student",
+      "group": "Students",
+      "focus": "Ultrafast electron diffraction of 2D materials",
+      "photo": "assets/images/people/grant.jpg"
+    },
+    {
+      "name": "Ruofei Zheng",
+      "role": "Ph.D. Student",
+      "group": "Students",
+      "focus": "Nanoscale spectroscopy of 2D materials",
+      "photo": "assets/images/people/ruofei.jpg"
+    },
+    {
+      "name": "Kathryn Froese",
+      "role": "M.Sc. Student",
+      "group": "Students",
+      "focus": "Machine learning for image denoising",
+      "photo": "assets/images/people/kathryn.jpg"
+    },
+    {
+      "name": "Aryan Mehta",
+      "role": "M.Sc. Student",
+      "group": "Students",
+      "focus": "Ultrafast electron diffraction coupled to mass spectrometry",
+      "photo": "assets/images/people/aryan.jpg"
+    },
+    {
+      "name": "Kazufumi Matsukura",
+      "role": "Technician",
+      "group": "Technical team",
+      "focus": "Supported by Hitachi High Technologies Canada and Japan",
+      "photo": ""
+    },
+    {
+      "name": "Tetyana Maksyuta",
+      "role": "NanoFab Technician",
+      "group": "Technical team",
+      "focus": "Ultrafast Electron Imaging Laboratory",
+      "photo": ""
+    },
+    {
+      "name": "Marko Kriegel",
+      "role": "Visiting Ph.D. Student · 2D-MATURE",
+      "group": "Visiting & co-supervised",
+      "focus": "University of Duisburg-Essen · Supervisor: Michael Horn von Hoegen",
+      "photo": ""
+    },
+    {
+      "name": "Muna Abdulaziz",
+      "role": "Co-Supervised Visiting Researcher",
+      "group": "Visiting & co-supervised",
+      "focus": "Ontario Tech · Electrochemical-SERS studies at high temperature and pressure",
+      "photo": ""
+    }
+  ],
+  "publications": [
+    {
+      "year": 2026,
+      "topic": "Quantum materials",
+      "journal": "ACS Applied Electronic Materials · 8, 5077–5089",
+      "title": "ZnO Surface Morphology and Chemistry Govern Exciton Dynamics in WS₂/ZnO Heterostructures",
+      "authors": "O. Kharsah, D. Sutarma, L. Daniel, D. Vidish, R. Zheng, S. Netzke, U. Hagemann, F. F. Morgado, M. Abdelbaky, S. Ustenko, W. Mertin, G. Bacher, G. Sciaini, K. Musselman, P. Kratzer & M. Schleberger",
+      "doi": "10.1021/acsaelm.6c00496",
+      "summary": "Surface morphology and chemistry control interfacial charge transfer and exciton decay in mixed-dimensional WS₂/ZnO heterostructures."
+    },
+    {
+      "year": 2026,
+      "topic": "Quantum materials",
+      "journal": "Ultrafast Science · 6, 0200",
+      "title": "Tracking Nuclear and Electronic Orders in the Charge-Density-Wave Phase of 1T″ NbTe₂",
+      "authors": "C. Viernes, S. Netzke, D. Sutarma, R. Zheng, L. Daniel, T. S. Lott, K. Pichugin, M. Schleberger, P. Kratzer & G. Sciaini",
+      "doi": "10.34133/ultrafastscience.0200",
+      "summary": "Complementary optical and electron probes resolve the coupled dynamics of electronic and lattice order."
+    },
+    {
+      "year": 2026,
+      "topic": "Ultrafast dynamics",
+      "journal": "Ultrafast Science · 6, 0148",
+      "title": "Reassessing the Practical Resolution Limits in Compact Ultrafast Electron Diffraction",
+      "authors": "S. Netzke, C. Viernes, K. Pichugin, S. Keramati, J. Jiang, R. J. D. Miller & G. Sciaini",
+      "doi": "10.34133/ultrafastscience.0148",
+      "summary": "A compact 100-kV instrument delivers approximately 200-fs electron pulses; modelling explores a path toward 50 fs."
+    },
+    {
+      "year": 2026,
+      "topic": "Ultrafast dynamics",
+      "journal": "Ultrafast Science · 6, 0129",
+      "title": "On the Overestimation of Efficiency in Relativistic Electron Scattering",
+      "authors": "G. Brassem, C. Viernes & G. Sciaini",
+      "doi": "10.34133/ultrafastscience.0129",
+      "summary": "A momentum-transfer-space analysis clarifies electron scattering efficiency and removes an angular-compression artifact."
+    },
+    {
+      "year": 2026,
+      "topic": "Quantum materials",
+      "journal": "Chemical Science · 17, 1176–1185",
+      "title": "Defect-engineered competition between exciton annihilation and trapping in MOCVD WS₂",
+      "authors": "R. Zheng, L. Daniel, D. Sutarma, C. Viernes, Y. Ding, T. Fabunmi, G. Bacher, M. Heuken, H. Kalisch, A. Vescan, P. Kratzer, M. Schleberger & G. Sciaini",
+      "doi": "10.1039/d5sc07343j",
+      "summary": "Transient absorption and quantum-efficiency measurements disentangle competing nonradiative exciton decay pathways."
+    },
+    {
+      "year": 2026,
+      "topic": "Liquid microscopy",
+      "journal": "Microscopy and Microanalysis · 32, 1448–1449",
+      "title": "Streamlined Liquid-Phase Electron Microscopy of Isolated Mitochondria",
+      "authors": "T. S. Lott, J. Chan, K. Pichugin, A. A. Petruk, T. Maksyuta, A. Berdeklis, S. Benourdja, R. E. Duncan, G. Sciaini",
+      "doi": "",
+      "citationUrl": "publications.html#cv-entry-62",
+      "kind": "Conference proceedings",
+      "summary": "Conference proceedings on liquid-phase electron microscopy of isolated mitochondria."
+    },
+    {
+      "year": 2025,
+      "topic": "Liquid microscopy",
+      "journal": "Microscopy Today · 33, 34–38",
+      "title": "Streamlined Liquid-Phase Electron Microscopy: Engineered Nanocontainers and Air-Free Loading for High-Resolution Imaging of Biospecimens",
+      "authors": "N. A. Shaw, T. S. Lott, A. A. Petruk, K. Pichugin & G. Sciaini",
+      "doi": "10.1093/mictod/qaaf013",
+      "summary": "Engineered nanocontainers simplify preparation and enable imaging of low-contrast vesicles and plasmid DNA."
+    },
+    {
+      "year": 2023,
+      "topic": "Liquid microscopy",
+      "journal": "Lab on a Chip · 23, 3217–3225",
+      "title": "Robust fully controlled nanometer liquid layers for high resolution liquid-cell electron microscopy",
+      "authors": "T. S. Lott, A. A. Petruk, N. A. Shaw, N. Hamada, C. M. Andrei, Y. Liu, J. Liu & G. Sciaini",
+      "doi": "10.1039/d3lc00190c",
+      "summary": "Shape-engineered nanofluidic cells and air-free loading deliver stable liquid layers and lattice resolution across the viewing window."
+    },
+    {
+      "year": 2023,
+      "topic": "Liquid microscopy",
+      "journal": "Microscopy and Microanalysis · 29, 658–659",
+      "title": "A High-Throughput Method for Bulgeless Liquid-cell Imaging in the Transmission Electron Microscope",
+      "authors": "T. S. Lott, A. A. Petruk, N. A. Shaw, N. Hamada, C. M. Andrei, Y. Liu, J. Liu, G. Sciaini",
+      "doi": "",
+      "citationUrl": "publications.html#cv-entry-65",
+      "kind": "Conference proceedings",
+      "summary": "Conference proceedings presenting a high-throughput approach to bulgeless liquid-cell imaging."
+    },
+    {
+      "year": 2022,
+      "topic": "Quantum materials",
+      "journal": "The Journal of Physical Chemistry C · 126, 13840",
+      "title": "Persistent photogenerated state attained by femtosecond laser irradiation of thin Td-MoTe2",
+      "authors": "M. Cheng, S. Zhong, N. Rivas, T. Dekker, A. A. Petruk, P. Gicala, K. Pichugin, F. Chen, X. Luo, Y. Sun, A. W. Tsen, G. Sciaini",
+      "doi": "10.1021/acs.jpcc.2c03987",
+      "citationUrl": "publications.html#cv-entry-21",
+      "kind": "Research article",
+      "summary": "Femtosecond excitation produces a persistent state in thin Td-MoTe₂, connecting interlayer motion with optically driven material changes."
+    },
+    {
+      "year": 2022,
+      "topic": "Quantum materials",
+      "journal": "Applied Physics Letters · 120, 123102",
+      "title": "Photoinduced interlayer dynamics in Td-MoTe2: a broadband pump-probe study",
+      "authors": "M. Cheng, S. Zhong, N. Rivas, T. Dekker, A. A. Petruk, P. Gicala, K. Pichugin, F. Chen, X. Luo, Y. Sun, A. W. Tsen, G. Sciaini",
+      "doi": "",
+      "citationUrl": "publications.html#cv-entry-25",
+      "kind": "Research article",
+      "summary": "Broadband pump–probe spectroscopy examines photoinduced interlayer dynamics in Td-MoTe₂."
+    },
+    {
+      "year": 2019,
+      "topic": "Ultrafast dynamics",
+      "journal": "Applied Sciences · 9, 1427",
+      "title": "Recent advances in ultrafast structural techniques",
+      "authors": "G. Sciaini",
+      "doi": "",
+      "citationUrl": "publications.html#cv-entry-35",
+      "kind": "Review article",
+      "summary": "An invited review of advances in techniques for observing ultrafast structural dynamics."
+    },
+    {
+      "year": 2019,
+      "topic": "Liquid microscopy",
+      "journal": "Nanotechnology · 30, 395703",
+      "title": "High flow rate nanofluidics for in-liquid electron microscopy and diffraction",
+      "authors": "A. A. Petruk, C. R. Allen, N. Rivas, K. Pichugin and G. Sciaini",
+      "doi": "",
+      "citationUrl": "publications.html#cv-entry-34",
+      "kind": "Research article",
+      "summary": "High-flow-rate nanofluidics developed for electron microscopy and diffraction of samples in liquids."
+    },
+    {
+      "year": 2017,
+      "topic": "Ultrafast dynamics",
+      "journal": "Structural Dynamics · 4, 044005",
+      "title": "Shaped cathodes for the production of ultra-short multi-electron pulses",
+      "authors": "A. A. Petruk, K. Pichugin and G. Sciaini",
+      "doi": "10.1063/1.4974779",
+      "citationUrl": "publications.html#cv-entry-37",
+      "kind": "Research article",
+      "summary": "A shaped-photocathode design explores geometric electric-field enhancement for producing ultrashort multi-electron pulses."
+    },
+    {
+      "year": 2010,
+      "topic": "Quantum materials",
+      "journal": "Nature · 468, 799",
+      "title": "Snapshots of cooperative atomic motions in the optical suppression of charge density waves",
+      "authors": "M. Eichberger, H. Schäfer, M. Krumova, M. Beyer, J. Demsar, H. Berger, G. Moriena, G. Sciaini and R. J. D. Miller",
+      "doi": "10.1038/nature09539",
+      "citationUrl": "publications.html#cv-entry-46",
+      "kind": "Research article",
+      "summary": "Femtosecond electron diffraction follows cooperative atomic motion during the optical suppression of a charge-density wave in 1T-TaS₂."
+    },
+    {
+      "year": 2009,
+      "topic": "Ultrafast dynamics",
+      "journal": "Nature · 458, 56",
+      "title": "Electronic acceleration of atomic motions and disordering in Bismuth",
+      "authors": "G. Sciaini, M. Harb, S. G. Kruglik, Th. Payer, C. T. Hebeisen, F. -J. Meyer zu Heringdorf, M. Yamaguchi, M. Horn von Hoegen, R. Ernstorfer and R. J. D. Miller",
+      "doi": "",
+      "citationUrl": "publications.html#cv-entry-49",
+      "kind": "Research article",
+      "summary": "A study of electronically driven atomic motion and disordering in bismuth."
+    }
+  ]
+};
