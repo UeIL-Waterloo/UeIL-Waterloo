@@ -547,6 +547,15 @@ nav a:hover,.text-link:hover {
 .people-tabs {
   margin-bottom:30px
 }
+.people-roster-group+.people-roster-group {
+  margin-top:40px
+}
+.people-roster-group>h3 {
+  font-family:Georgia,'Times New Roman',serif;
+  font-size:24px;
+  font-weight:400;
+  margin-bottom:18px
+}
 .people-grid {
   display:grid;
   grid-template-columns:repeat(4,1fr);

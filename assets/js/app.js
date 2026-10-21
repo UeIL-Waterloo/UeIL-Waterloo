@@ -78,15 +78,29 @@ document.querySelectorAll('[data-topic-link]').forEach(link => {
 search.addEventListener('input', renderPublications);
 
 function renderPeople(group = 'All') {
-  document.querySelector('#people-grid').innerHTML = people
-    .filter(p => group === 'All' || p.group === group)
-    .map(p => '<article class="person"><div class="portrait">' +
-      `<span class="initials" aria-hidden="true">${escapeHtml(p.name.split(' ').map(n => n[0]).slice(0, 2).join(''))}</span>` +
-      '<span class="photo-label">PORTRAIT TO COME</span>' +
-      (p.photo ? `<img src="${escapeHtml(p.photo)}" alt="${escapeHtml(p.name)}" loading="lazy">` : '') +
-      `</div><h3>${escapeHtml(p.name)}</h3>` +
+  const filteredPeople = people.filter(p => group === 'All' || p.group === group);
+  const picturedPeople = filteredPeople.filter(p => p.pictured);
+  const nonPicturedPeople = filteredPeople.filter(p => !p.pictured);
+
+  function renderGroup(selector, groupSelector, members) {
+    document.querySelector(selector).innerHTML = members
+      .map(p => `<article class="person">${
+        p.pictured
+          ? '<div class="portrait">' +
+            `<span class="initials" aria-hidden="true">${escapeHtml(p.name.split(' ').map(n => n[0]).slice(0, 2).join(''))}</span>` +
+            (p.photo
+              ? `<img src="${escapeHtml(p.photo)}" alt="${escapeHtml(p.name)}" loading="lazy">`
+              : '<span class="photo-label">PORTRAIT TO COME</span>') +
+            '</div>'
+          : ''
+      }<h3>${escapeHtml(p.name)}</h3>` +
       `<p class="role">${escapeHtml(p.role)}</p><p class="focus">${escapeHtml(p.focus)}</p></article>`)
-    .join('');
+      .join('');
+    document.querySelector(groupSelector).hidden = members.length === 0;
+  }
+
+  renderGroup('#pictured-people-grid', '#pictured-people-group', picturedPeople);
+  renderGroup('#non-pictured-people-grid', '#non-pictured-people-group', nonPicturedPeople);
 }
 
 document.querySelectorAll('[data-people]').forEach(button => {

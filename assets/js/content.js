@@ -6,84 +6,96 @@ window.siteContent = {
       "role": "Postdoctoral Fellow",
       "group": "Researchers",
       "focus": "Compact ultrafast electron diffraction",
-      "photo": "assets/images/people/sam.jpg"
+      "photo": "assets/images/people/sam.jpg",
+      "pictured": true,
     },
     {
       "name": "Tyler Lott",
       "role": "Postdoctoral Fellow",
       "group": "Researchers",
       "focus": "Nanofluidics and liquid-cell electron microscopy",
-      "photo": "assets/images/people/tyler.jpg"
+      "photo": "assets/images/people/tyler.jpg",
+      "pictured": true,
     },
     {
       "name": "Saadia Benourdja",
       "role": "Research Associate · Part-time",
       "group": "Researchers",
       "focus": "Ultrafast Electron Imaging Laboratory",
-      "photo": ""
+      "photo": "",
+      "pictured": true,
     },
     {
       "name": "Ida Rezaei",
       "role": "Ph.D. Student · Co-supervised with Schulz",
       "group": "Students",
       "focus": "Metasurfaces for compact hyperspectral cathodoluminescence",
-      "photo": ""
+      "photo": "",
+      "pictured": true,
     },
     {
       "name": "Grant Brassem",
       "role": "Ph.D. Student",
       "group": "Students",
       "focus": "Ultrafast electron diffraction of 2D materials",
-      "photo": "assets/images/people/grant.jpg"
+      "photo": "assets/images/people/grant.jpg",
+      "pictured": true,
     },
     {
       "name": "Ruofei Zheng",
       "role": "Ph.D. Student",
       "group": "Students",
       "focus": "Nanoscale spectroscopy of 2D materials",
-      "photo": "assets/images/people/ruofei.jpg"
+      "photo": "assets/images/people/ruofei.jpg",
+      "pictured": true,
     },
     {
       "name": "Kathryn Froese",
       "role": "M.Sc. Student",
       "group": "Students",
       "focus": "Machine learning for image denoising",
-      "photo": "assets/images/people/kathryn.jpg"
+      "photo": "assets/images/people/kathryn.jpg",
+      "pictured": true,
     },
     {
       "name": "Aryan Mehta",
       "role": "M.Sc. Student",
       "group": "Students",
       "focus": "Ultrafast electron diffraction coupled to mass spectrometry",
-      "photo": "assets/images/people/aryan.jpg"
+      "photo": "assets/images/people/aryan.jpg",
+      "pictured": true,
     },
     {
       "name": "Kazufumi Matsukura",
       "role": "Technician",
       "group": "Technical team",
       "focus": "Supported by Hitachi High Technologies Canada and Japan",
-      "photo": ""
+      "photo": "",
+      "pictured": false,
     },
     {
       "name": "Tetyana Maksyuta",
       "role": "NanoFab Technician",
       "group": "Technical team",
       "focus": "Ultrafast Electron Imaging Laboratory",
-      "photo": ""
+      "photo": "",
+      "pictured": true,
     },
     {
       "name": "Marko Kriegel",
       "role": "Visiting Ph.D. Student · 2D-MATURE",
       "group": "Visiting & co-supervised",
       "focus": "University of Duisburg-Essen · Supervisor: Michael Horn von Hoegen",
-      "photo": ""
+      "photo": "",
+      "pictured": false,
     },
     {
       "name": "Muna Abdulaziz",
       "role": "Co-Supervised Visiting Researcher",
       "group": "Visiting & co-supervised",
       "focus": "Ontario Tech · Electrochemical-SERS studies at high temperature and pressure",
-      "photo": ""
+      "photo": "",
+      "pictured": false,
     }
   ],
   "publications": [
