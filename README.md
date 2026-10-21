@@ -72,7 +72,7 @@ These image paths are relative to `index.html`, not to the JavaScript file. Empt
 
 ### Publication highlights
 
-Edit the `publications` array in `assets/js/content.js`. Theme names must match the filter buttons in `index.html`. Current totals are 5 Ultrafast dynamics, 6 Quantum materials and 5 Liquid microscopy. If adding/removing highlights, update the visible counts in those buttons. Use a verified `doi`, or an internal `citationUrl` pointing to a bibliography entry. Keep conference proceedings labelled in `kind`.
+Edit the `publications` array in `assets/js/content.js`. Theme names must match the filter buttons in `index.html`. Current totals are 5 Ultrafast dynamics, 6 Quantum materials and 5 Liquid microscopy. Totals are dynamically calculated, but double check correctness. Use a verified `doi`, or an internal `citationUrl` pointing to a bibliography entry. Keep conference proceedings labelled in `kind`.
 
 ### Complete bibliography
 
