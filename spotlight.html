@@ -1,0 +1,84 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <meta name="theme-color" content="#143b32">
+    <title>Research Spotlights — UeIL</title>
+    <meta name="description" content="In-depth stories about research from the Sciaini Group, with figures, findings and links to research data.">
+    <link rel="stylesheet" href="assets/css/style.css">
+    <script src="assets/js/navigation.js" defer></script>
+    <script src="assets/js/spotlights.js" defer></script>
+    <script src="assets/js/figures.js" defer></script>
+  </head>
+  <body>
+    <a class="skip" href="#main">Skip to content</a>
+    <header>
+      <a class="brand" href="index.html" aria-label="UeIL home"><span class="mark" aria-hidden="true">s<span>·</span></span><span>Ultrafast Electron Imaging Lab<small>Sciaini Group</small></span></a>
+      <button class="menu-toggle" aria-expanded="false" aria-controls="navigation">
+        Menu <span>☰</span>
+      </button>
+      <nav id="navigation" aria-label="Main navigation">
+        <a href="index.html">Home</a>
+        <div class="publications-nav">
+          <a href="index.html#publications">Publications <span class="nav-dropdown-indicator" aria-hidden="true">⌄</span></a>
+          <div class="publications-menu">
+            <a href="publications.html">Complete Publications <span aria-hidden="true">→</span></a>
+            <a href="spotlight.html" aria-current="page">Research Spotlights <span aria-hidden="true">→</span></a>
+          </div>
+        </div>
+        <a href="index.html#people">People</a>
+        <a href="index.html#pi">Principal Investigator</a>
+        <details class="education-dropdown">
+          <summary>Educational Software <span aria-hidden="true">⌄</span></summary>
+          <div class="education-links" aria-label="Educational visualizers">
+            <a href="educational-software/Hydrogen_Orbital_Visualizer.html" target="_blank" rel="noopener">Hydrogen Orbital Visualizer <span aria-hidden="true">→</span></a>
+            <a href="educational-software/Hybrid_Orbital_Visualizer.html" target="_blank" rel="noopener">Hybrid Orbital Visualizer <span aria-hidden="true">→</span></a>
+            <a href="educational-software/Molecular_Orbital_Visualizer.html" target="_blank" rel="noopener">Molecular Orbital Visualizer <span aria-hidden="true">→</span></a>
+            <small>Opens in a new tab</small>
+          </div>
+        </details>
+        <a class="nav-contact" href="index.html#contact">Connect</a>
+      </nav>
+    </header>
+    <main id="main" class="spotlights-page">
+      <div class="wrap spotlight-page-heading">
+        <a class="text-link" href="index.html">← Back to home</a>
+        <h1>Research Spotlights</h1>
+        <p>Longer form writing about our research.</p>
+        <details class="spotlight-toc">
+          <summary>Contents</summary>
+          <ul id="spotlight-toc-list"></ul>
+        </details>
+      </div>
+      <div id="spotlight-error" class="wrap" role="alert" hidden>
+        Research Spotlights could not be loaded. Please try again later.
+      </div>
+      <div id="spotlight-list" class="spotlight-list"></div>
+    </main>
+    <footer class="site-footer">
+      <div class="wrap footer-inner">
+        <a class="footer-name" href="index.html">Ultrafast Electron Imaging Laboratory<span>→</span></a>
+        <nav class="footer-affiliations" aria-label="Institutional affiliations">
+          <a href="https://uwaterloo.ca/" target="_blank" rel="noopener" aria-label="University of Waterloo"><span class="footer-affiliation-full">University of Waterloo ↗</span><span class="footer-affiliation-compact" aria-hidden="true">UWaterloo</span></a>
+          <a href="https://uwaterloo.ca/chemistry/" target="_blank" rel="noopener" aria-label="Department of Chemistry"><span class="footer-affiliation-full">Department of Chemistry ↗</span><span class="footer-affiliation-compact" aria-hidden="true">Dept. Chemistry</span></a>
+          <a href="https://uwaterloo.ca/institute-nanotechnology/" target="_blank" rel="noopener" aria-label="Waterloo Institute of Nanotechnology"><span class="footer-affiliation-full">Waterloo Institute of Nanotechnology ↗</span><span class="footer-affiliation-compact" aria-hidden="true">WIN</span></a>
+        </nav>
+        <div class="footer-meta">
+          <span>© 2026 Ultrafast Electron Imaging Laboratory</span>
+        </div>
+      </div>
+    </footer>
+    <dialog id="figure-viewer" aria-labelledby="figure-viewer-title">
+      <button class="close" aria-label="Close enlarged figure">×</button>
+      <p class="eyebrow">PUBLICATION FIGURE</p>
+      <h2 id="figure-viewer-title"></h2>
+      <div class="figure-viewer-image">
+        <img id="figure-viewer-img" alt="Figure viewer">
+      </div>
+      <p id="figure-viewer-caption"></p>
+      <p id="figure-viewer-citation" class="figure-viewer-citation"></p>
+      <a id="figure-viewer-link" class="source-link" target="_blank" rel="noopener">Read source publication ↗</a>
+    </dialog>
+  </body>
+</html>

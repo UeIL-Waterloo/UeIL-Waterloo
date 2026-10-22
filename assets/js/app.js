@@ -13,6 +13,10 @@ const escapeHtml = value =>
 
 let selectedTopic = 'Ultrafast dynamics';
 const search = document.querySelector('#publication-search');
+const publicationList = document.querySelector('#publication-list');
+const publicationError = document.querySelector('#publication-error');
+let bibliographyPromise;
+let publicationErrorReported = false;
 const topicCounts = publications.reduce((counts, publication) => {
   counts.set(publication.topic, (counts.get(publication.topic) || 0) + 1);
   return counts;
@@ -24,29 +28,84 @@ topicButtons.forEach(button => {
   button.textContent = `${topic} · ${topicCounts.get(topic) || 0}`;
 });
 
-function renderPublications() {
+function loadBibliography() {
+  if (!bibliographyPromise) {
+    bibliographyPromise = fetch('data/publications.json').then(response => {
+      if (!response.ok) {
+        throw new Error(`Publication data request failed with status ${response.status}`);
+      }
+      return response.json();
+    }).then(data => {
+      if (!Array.isArray(data.entries)) {
+        throw new Error('Publication data does not contain an entries array');
+      }
+      return data.entries;
+    });
+  }
+  return bibliographyPromise;
+}
+
+function resolveCitationUrl(publication, entries) {
+  const matches = entries.filter(entry =>
+    entry.title === publication.citationTitle &&
+    entry.year === String(publication.year) &&
+    entry.category === publication.citationCategory);
+
+  if (matches.length !== 1) {
+    throw new Error(
+      `Expected one bibliography entry for "${publication.citationTitle}" (${publication.year}); found ${matches.length}`,
+    );
+  }
+  return `publications.html#${encodeURIComponent(matches[0].id)}`;
+}
+
+async function renderPublications() {
+  let bibliographyEntries;
+  try {
+    bibliographyEntries = await loadBibliography();
+  } catch (error) {
+    publicationError.hidden = false;
+    if (!publicationErrorReported) {
+      console.error('Unable to load data/publications.json for publication links.', error);
+      publicationErrorReported = true;
+    }
+    return;
+  }
+
   const term = search.value.trim().toLowerCase();
   const matches = publications.filter(p =>
     p.topic === selectedTopic &&
     [p.title, p.authors, p.journal, p.year, p.topic].join(' ').toLowerCase().includes(term));
 
-  document.querySelector('#publication-list').innerHTML = matches.map(p => {
-    const url = p.doi ? 'https://doi.org/' + p.doi : p.citationUrl;
-    const external = p.doi ? ' target="_blank" rel="noopener"' : '';
-    const action = p.doi ? 'Read publication' : 'View full citation';
+  try {
+    publicationList.innerHTML = matches.map(p => {
+      const url = p.doi
+        ? `https://doi.org/${p.doi}`
+        : resolveCitationUrl(p, bibliographyEntries);
+      const external = p.doi ? ' target="_blank" rel="noopener"' : '';
+      const action = p.doi ? 'Read publication' : 'View full citation';
 
-    return '<article class="publication">' +
-      `<div class="pub-year">${p.year}</div>` +
-      '<div><div class="pub-meta">' +
-      `${escapeHtml(p.journal)}${p.kind ? ' &nbsp; / &nbsp; ' + escapeHtml(p.kind) : ''}` +
-      '</div><h3><a href="' + escapeHtml(url) + '"' + external + '>' +
-      `${escapeHtml(p.title)}</a></h3>` +
-      `<p class="pub-authors">${escapeHtml(p.authors)}</p>` +
-      `<p class="pub-summary">${escapeHtml(p.summary)}</p></div>` +
-      '<a class="pub-arrow" href="' + escapeHtml(url) + '"' + external +
-      ' aria-label="' + action + ': ' + escapeHtml(p.title) + '" title="' + action + '">' +
-      (p.doi ? '↗' : '→') + '</a></article>';
-  }).join('');
+      return '<article class="publication">' +
+        `<div class="pub-year">${p.year}</div>` +
+        '<div><div class="pub-meta">' +
+        `${escapeHtml(p.journal)}${p.kind ? ' &nbsp; / &nbsp; ' + escapeHtml(p.kind) : ''}` +
+        '</div><h3><a href="' + escapeHtml(url) + '"' + external + '>' +
+        `${escapeHtml(p.title)}</a></h3>` +
+        `<p class="pub-authors">${escapeHtml(p.authors)}</p>` +
+        `<p class="pub-summary">${escapeHtml(p.summary)}</p></div>` +
+        '<a class="pub-arrow" href="' + escapeHtml(url) + '"' + external +
+        ' aria-label="' + action + ': ' + escapeHtml(p.title) + '" title="' + action + '">' +
+        (p.doi ? '↗' : '→') + '</a></article>';
+    }).join('');
+    publicationError.hidden = true;
+  } catch (error) {
+    publicationError.hidden = false;
+    if (!publicationErrorReported) {
+      console.error('Unable to resolve a homepage citation against data/publications.json.', error);
+      publicationErrorReported = true;
+    }
+    return;
+  }
 
   const total = topicCounts.get(selectedTopic) || 0;
   document.querySelector('#result-count').textContent =
@@ -78,9 +137,11 @@ document.querySelectorAll('[data-topic-link]').forEach(link => {
 search.addEventListener('input', renderPublications);
 
 function renderPeople(group = 'All') {
-  const filteredPeople = people.filter(p => group === 'All' || p.group === group);
+  const filteredPeople = people.filter(p =>
+    p.current !== false && (group === 'All' || p.group === group));
   const picturedPeople = filteredPeople.filter(p => p.pictured);
   const nonPicturedPeople = filteredPeople.filter(p => !p.pictured);
+  const previousPeople = people.filter(p => p.current === false);
 
   function renderGroup(selector, groupSelector, members) {
     document.querySelector(selector).innerHTML = members
@@ -101,6 +162,10 @@ function renderPeople(group = 'All') {
 
   renderGroup('#pictured-people-grid', '#pictured-people-group', picturedPeople);
   renderGroup('#non-pictured-people-grid', '#non-pictured-people-group', nonPicturedPeople);
+  document.querySelector('#previous-people-list').innerHTML = previousPeople
+    .map(p => `<li><strong>${escapeHtml(p.name)}</strong><span>${escapeHtml(p.role)}</span></li>`)
+    .join('');
+  document.querySelector('#previous-people-group').hidden = previousPeople.length === 0;
 }
 
 document.querySelectorAll('[data-people]').forEach(button => {
@@ -111,28 +176,6 @@ document.querySelectorAll('[data-people]').forEach(button => {
     });
     renderPeople(button.dataset.people);
   });
-});
-
-const toggle = document.querySelector('.menu-toggle');
-const nav = document.querySelector('nav');
-
-toggle.addEventListener('click', () => {
-  const open = nav.classList.toggle('open');
-  toggle.setAttribute('aria-expanded', String(open));
-});
-
-nav.querySelectorAll('a').forEach(link => {
-  link.addEventListener('click', () => {
-    nav.classList.remove('open');
-    toggle.setAttribute('aria-expanded', 'false');
-  });
-});
-
-document.addEventListener('keydown', event => {
-  if (event.key === 'Escape') {
-    nav.classList.remove('open');
-    toggle.setAttribute('aria-expanded', 'false');
-  }
 });
 
 const credits = document.querySelector('#credits');

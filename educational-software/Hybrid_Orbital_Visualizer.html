@@ -158,7 +158,7 @@ button:focus-visible,select:focus-visible,input:focus-visible{outline:2px solid 
 
     <label class="check"><input id="autoFace" type="checkbox" checked> Auto-face reference σ hybrids</label>
     <label class="check"><input id="sigmaLock" type="checkbox" checked> σ-bond constraint: rotation only about bond axis</label>
-    <label class="check"><input id="showPiBond" type="checkbox" checked> Show π-overlap density for visible p orbitals</label>
+    <label class="check"><input id="showPiBond" type="checkbox" checked> Show π-bond density for visible p orbitals</label>
 
     <label for="overlapPair" style="display:block;margin-top:8px;">Overlap pair</label>
     <select id="overlapPair"></select>
@@ -202,10 +202,6 @@ button:focus-visible,select:focus-visible,input:focus-visible{outline:2px solid 
       <option value="mono">Monochrome</option>
     </select>
 
-    <label class="check"><input id="bondSound" type="checkbox"> Sound on bond formation</label>
-    <label for="bondVolume">Bond sound volume <span id="bondVolumeVal">20%</span></label>
-    <input id="bondVolume" type="range" min="0" max="100" step="1" value="20" aria-label="Bond sound volume">
-    <div class="note">In-phase π overlap is shown before electrons are added. A formed bond requires one electron in each overlapping orbital. Formed σ bonds are green; formed π bonds are light orange, overriding phase colours.</div>
     <label class="check"><input id="editElectrons" type="checkbox" checked> Add electrons by clicking lobes</label>
     <label class="check"><input id="removeElectronMode" type="checkbox"> Remove electrons when clicking or tapping</label>
     <button id="clearElectrons">Clear all electron dots</button>
@@ -575,7 +571,7 @@ function drawGuides(m){
     segs.forEach(s=>drawLine3D(s[0],s[1],m,state.light?'rgba(35,55,75,.24)':'rgba(210,230,250,.16)',1,[4,5]));
   });
   if(state.centers.length>1){
-    for(const q of sigmaConnections())if(visibleHybridIndices(q.a).includes(q.ha)&&visibleHybridIndices(q.b).includes(q.hb))drawLine3D(q.A,q.B,m,'#20df88',3);
+    for(const q of sigmaConnections())if(visibleHybridIndices(q.a).includes(q.ha)&&visibleHybridIndices(q.b).includes(q.hb))drawLine3D(q.A,q.B,m,state.light?'rgba(25,40,60,.35)':'rgba(255,255,255,.35)',1.4);
   }
 }
 function drawNucleus(i,m){
@@ -611,7 +607,7 @@ function pPhase(i,pi){
 }
 function electronCount(i,type,index){return state.centers[i].electrons?.[type]?.[index]||0;}
 let sigmaCacheKey='',sigmaCache=[];
-function sigmaOverlaps(){
+function sigmaConnections(){
   const key=JSON.stringify([state.spacing,state.lobeScale,state.autoFace,state.sigmaLock,state.centers.map(c=>[c.kind,c.selected,c.base,c.frame,c.reference,c.bondHybrid,c.pos,c.rot,c.torsion,c.electrons?.hybrid])]);
   if(key===sigmaCacheKey)return sigmaCache;
   const length=1.55*state.lobeScale,width=.54*state.lobeScale;
@@ -659,7 +655,6 @@ function sigmaOverlaps(){
   }
   sigmaCacheKey=key;sigmaCache=assigned;return assigned;
 }
-function sigmaConnections(){return sigmaOverlaps().filter(q=>electronCount(q.a,'hybrid',q.ha)===1&&electronCount(q.b,'hybrid',q.hb)===1);}
 function sigmaBondAvailable(a,b){return sigmaConnections().some(q=>q.a===Math.min(a,b)&&q.b===Math.max(a,b));}
 function rawPiOverlap(a,b,pai=state.centers[a].selectedP||0,pbi=state.centers[b].selectedP||0){
   if(state.centers.length<2)return {eligible:false,score:0,formed:false};
@@ -677,9 +672,8 @@ function rawPiOverlap(a,b,pai=state.centers[a].selectedP||0,pbi=state.centers[b]
   const geometryMatched=parallel>=0.94 && perpendicular>=0.90 && distanceScore>=0.72;
   const inPhase=dot(pa,pb)>0;
   const lonePair=electronCount(a,'p',pai)===2||electronCount(b,'p',pbi)===2;
-  const electronsReady=electronCount(a,'p',pai)===1&&electronCount(b,'p',pbi)===1;
-  const formed=geometryMatched&&inPhase&&electronsReady,outOfPhase=geometryMatched&&!inPhase;
-  return {eligible:true,score,formed,inPhase,outOfPhase,lonePair,electronsReady,geometryMatched,a,b,pai,pbi,A,B,dist,pa,pb,bond,parallel,perpendicular,distanceScore};
+  const formed=geometryMatched&&inPhase&&!lonePair,outOfPhase=geometryMatched&&!inPhase;
+  return {eligible:true,score,formed,inPhase,outOfPhase,lonePair,a,b,pai,pbi,A,B,dist,pa,pb,bond,parallel,perpendicular,distanceScore};
 }
 function allPiOverlaps(){
   const candidates=[],fallback=[];
@@ -689,7 +683,7 @@ function allPiOverlaps(){
     as.forEach((_,pai)=>bs.forEach((_,pbi)=>{
       const q=rawPiOverlap(a,b,pai,pbi);
       if(q.score>best.score)best=q;
-      if(q.geometryMatched&&q.inPhase&&!q.lonePair)candidates.push(q);
+      if(q.formed)candidates.push(q);
     }));
     fallback.push(best);
   }
@@ -699,7 +693,7 @@ function allPiOverlaps(){
   function search(k,used,bonds){
     if(k===candidates.length){
       const coverage=new Set(bonds.map(q=>`${q.a}:${q.b}`)).size;
-      const value=bonds.filter(q=>q.formed).length*100000+coverage*1000+bonds.length*100+bonds.reduce((n,q)=>n+q.score+
+      const value=coverage*1000+bonds.length*100+bonds.reduce((n,q)=>n+q.score+
         .001*(Number(q.pai===state.centers[q.a].selectedP)+Number(q.pbi===state.centers[q.b].selectedP)),0);
       if(value>bestValue){bestValue=value;best=bonds.slice();}return;
     }
@@ -712,16 +706,16 @@ function allPiOverlaps(){
   if(candidates.length<=16)search(0,new Set(),[]);
   else {
     const used=new Set(),covered=new Set();
-    candidates.sort((a,b)=>Number(b.formed)-Number(a.formed)||b.score-a.score||a.a-b.a||a.b-b.b);
+    candidates.sort((a,b)=>b.score-a.score||a.a-b.a||a.b-b.b);
     for(let pass=0;pass<2;pass++)for(const q of candidates){
       const ka=`${q.a}:${q.pai}`,kb=`${q.b}:${q.pbi}`,pair=`${q.a}:${q.b}`;
-      if(used.has(ka)||used.has(kb)||(pass===0&&!q.formed&&covered.has(pair)))continue;
+      if(used.has(ka)||used.has(kb)||(pass===0&&covered.has(pair)))continue;
       best.push(q);used.add(ka);used.add(kb);covered.add(pair);
     }
   }
   return fallback.flatMap(q=>{
     const assigned=best.filter(x=>x.a===q.a&&x.b===q.b);
-    return assigned.length?assigned:[{...q,formed:false,blocked:q.geometryMatched&&q.inPhase&&!q.lonePair}];
+    return assigned.length?assigned:[{...q,formed:false,blocked:q.formed}];
   });
 }
 function piOverlapMetrics(a=pairIndices()[0],b=pairIndices()[1]){
@@ -746,7 +740,7 @@ function ellipsoidMesh(center,e1,e2,e3,ra,rb,rc,tag){
   return tris;
 }
 function piBondVisible(q){
-  return state.showPiBond&&q.geometryMatched&&q.inPhase&&!q.lonePair&&!q.blocked&&visiblePAxes(q.a).some(p=>p.pi===q.pai)&&visiblePAxes(q.b).some(p=>p.pi===q.pbi);
+  return state.showPiBond&&q.formed&&visiblePAxes(q.a).some(p=>p.pi===q.pai)&&visiblePAxes(q.b).some(p=>p.pi===q.pbi);
 }
 function piBondTriangles(){
   return allPiOverlaps().filter(piBondVisible).flatMap(piBondMesh);
@@ -759,7 +753,7 @@ function piBondMesh(q){
   const side=norm(cross(q.bond,pdir)),mid=mul(add(q.A,q.B),.5);
   const along=Math.max(.62,q.dist*.53),off=.68*state.pScale,thickP=.30*state.pScale,thickSide=.24*state.pScale;
   const alpha=clamp(.18+.32*q.score,.18,.50)*state.pOpacity/.68;
-  const tag1={type:'piBond',formed:q.formed,a:q.a,b:q.b,pai:q.pai,pbi:q.pbi,phase:1,opacity:alpha},tag2={type:'piBond',formed:q.formed,a:q.a,b:q.b,pai:q.pai,pbi:q.pbi,phase:-1,opacity:alpha};
+  const tag1={type:'piBond',a:q.a,b:q.b,pai:q.pai,pbi:q.pbi,phase:1,opacity:alpha},tag2={type:'piBond',a:q.a,b:q.b,pai:q.pai,pbi:q.pbi,phase:-1,opacity:alpha};
   return [
     ...ellipsoidMesh(add(mid,mul(pdir,off)),q.bond,pdir,side,along,thickP,thickSide,tag1),
     ...ellipsoidMesh(add(mid,mul(pdir,-off)),q.bond,pdir,side,along,thickP,thickSide,tag2)
@@ -771,28 +765,10 @@ function terminalSOrbitals(){
   state.centers.forEach((c,i)=>{
     const M=centerOrientation(i),origin=centerPosition(i),axes=orbitalData[c.kind].vectors.map(v=>applyM(M,v));
     const used=new Set();
-    sigmaOverlaps().forEach(q=>{if(q.a===i)used.add(q.ha);if(q.b===i)used.add(q.hb)});
+    sigmaConnections().forEach(q=>{if(q.a===i)used.add(q.ha);if(q.b===i)used.add(q.hb)});
     axes.forEach((axis,oi)=>{if(!used.has(oi)&&electronCount(i,'hybrid',oi)<2&&visibleHybridIndices(i).includes(oi))result.push({ci:i,oi,axis,origin,center:add(origin,mul(axis,1.85*state.lobeScale)),radius:.55*state.lobeScale});});
   });
   return result;
-}
-function terminalBonded(s){return electronCount(s.ci,'hybrid',s.oi)===1&&electronCount(s.ci,'s',s.oi)===1;}
-function bondedOrbitalKeys(){
-  const keys=new Set();
-  sigmaConnections().forEach(q=>{keys.add(`${q.a}:hybrid:${q.ha}`);keys.add(`${q.b}:hybrid:${q.hb}`)});
-  allPiOverlaps().filter(q=>q.formed).forEach(q=>{keys.add(`${q.a}:p:${q.pai}`);keys.add(`${q.b}:p:${q.pbi}`)});
-  terminalSOrbitals().filter(terminalBonded).forEach(s=>{keys.add(`${s.ci}:hybrid:${s.oi}`);keys.add(`${s.ci}:s:${s.oi}`)});
-  return keys;
-}
-let audioContext=null,previousBondKeys=new Set();
-function updateBondSound(){
-  const keys=new Set(sigmaConnections().map(q=>`s:${q.a}:${q.ha}:${q.b}:${q.hb}`));
-  allPiOverlaps().filter(q=>q.formed).forEach(q=>keys.add(`p:${q.a}:${q.pai}:${q.b}:${q.pbi}`));
-  terminalSOrbitals().filter(terminalBonded).forEach(s=>keys.add(`t:${s.ci}:${s.oi}`));
-  const added=[...keys].some(k=>!previousBondKeys.has(k));previousBondKeys=keys;
-  const volume=clamp(Number($('bondVolume').value)/100,0,1);
-  if(!added||!$('bondSound').checked||!audioContext||volume===0)return;
-  try{const t=audioContext.currentTime,o=audioContext.createOscillator(),g=audioContext.createGain();o.frequency.setValueAtTime(660,t);o.frequency.exponentialRampToValueAtTime(880,t+.12);g.gain.setValueAtTime(.0001,t);g.gain.exponentialRampToValueAtTime(.30*volume,t+.015);g.gain.exponentialRampToValueAtTime(.0001,t+.22);o.connect(g);g.connect(audioContext.destination);o.start(t);o.stop(t+.23);}catch(e){}
 }
 function terminalSTriangles(){
   return terminalSOrbitals().flatMap(s=>ellipsoidMesh(s.center,[1,0,0],[0,1,0],[0,0,1],s.radius,s.radius,s.radius,{type:'s',ci:s.ci,oi:s.oi,opacity:state.sOpacity}));
@@ -804,7 +780,7 @@ function drawTerminalS(m){
     if(state.showLabels){
       const label=project(add(s.center,mul(s.axis,s.radius+.18)),m);
       ctx.textAlign='center';ctx.font='11px system-ui';ctx.lineWidth=3;ctx.strokeStyle=state.light?'#fff':'#07111f';
-      const text=electronCount(s.ci,'s',s.oi)===2?`1s lone pair (C${s.ci+1})`:terminalBonded(s)?`1s–h${s.oi+1} σ bond (C${s.ci+1})`:`1s overlap (C${s.ci+1} h${s.oi+1})`;ctx.strokeText(text,label.x,label.y);ctx.fillText(text,label.x,label.y);
+      const text=electronCount(s.ci,'s',s.oi)===2?`1s lone pair (C${s.ci+1})`:`1s–h${s.oi+1} σ (C${s.ci+1})`;ctx.strokeText(text,label.x,label.y);ctx.fillText(text,label.x,label.y);
     }ctx.restore();
   }
 }
@@ -862,16 +838,12 @@ function drawScene(){
   }).sort((A,B)=>B.z-A.z);
 
   orbitalHitFaces=proj.filter(t=>['hybrid','p','s'].includes(t.tag.type));
-  const bonded= bondedOrbitalKeys();
   proj.forEach(t=>{
     let base;
     if(t.tag.type==='hybrid')base=hybridColor(t.tag.oi,t.tag.back,t.tag.ci);
     else if(t.tag.type==='s')base=state.colorMode==='phase'?'#42a5f5':state.colorMode==='mono'?'#dce5ee':'#ffc66d';
     else if(t.tag.type==='piBond')base=pColor(t.tag.phase,t.tag.pai);
     else base=pColor(t.tag.phase,t.tag.pi);
-    const isBonded=bonded.has(`${t.tag.ci}:${t.tag.type}:${t.tag.type==='p'?t.tag.pi:t.tag.oi}`);
-    const highlighted=t.tag.type==='hybrid'&&state.attachmentHighlight&&t.tag.ci===state.attachCentre&&t.tag.oi===state.attachHybrid;
-    if((isBonded||(t.tag.type==='piBond'&&t.tag.formed))&&!highlighted)base=(t.tag.type==='p'||t.tag.type==='piBond')?'#ffbd80':'#20df88';
     const shade=(t.light-.35)*.34;
     ctx.beginPath();ctx.moveTo(t.pa.x,t.pa.y);ctx.lineTo(t.pb.x,t.pb.y);ctx.lineTo(t.pc.x,t.pc.y);ctx.closePath();
     ctx.globalAlpha=t.tag.opacity;ctx.fillStyle=mixColor(base,shade);ctx.fill();
@@ -885,8 +857,8 @@ function drawScene(){
   if(state.showLabels && piBondVisible(pq)){
     const mid=mul(add(pq.A,pq.B),.5),lab=project(add(mid,mul(norm(add(pq.pa,mul(pq.pb,dot(pq.pa,pq.pb)>=0?1:-1))),1.12*state.pScale)),m);
     ctx.save();ctx.textAlign='center';ctx.font='700 13px system-ui';ctx.lineWidth=4;
-    ctx.strokeStyle=state.light?'rgba(255,255,255,.9)':'rgba(3,8,18,.9)';ctx.strokeText(`${pq.formed?'π bond':'π overlap'}: C${pq.a+1} p${pq.pai+1}–C${pq.b+1} p${pq.pbi+1}`,lab.x,lab.y);
-    ctx.fillStyle=pq.formed?(state.light?'#9b4e13':'#ffbd80'):(state.light?'#493075':'#ddd3ff');ctx.fillText(`${pq.formed?'π bond':'π overlap'}: C${pq.a+1} p${pq.pai+1}–C${pq.b+1} p${pq.pbi+1}`,lab.x,lab.y);ctx.restore();
+    ctx.strokeStyle=state.light?'rgba(255,255,255,.9)':'rgba(3,8,18,.9)';ctx.strokeText(`π: C${pq.a+1} p${pq.pai+1}–C${pq.b+1} p${pq.pbi+1}`,lab.x,lab.y);
+    ctx.fillStyle=state.light?'#4c1d95':'#ddd6fe';ctx.fillText(`π: C${pq.a+1} p${pq.pai+1}–C${pq.b+1} p${pq.pbi+1}`,lab.x,lab.y);ctx.restore();
   }
   }
   ctx.restore();
@@ -971,9 +943,8 @@ function updateInfo(){
   }).join(' · ');
 }
 function updatePiStatus(){
-  updateBondSound();
   const sigma=sigmaConnections();
-  $('sigmaStatus').textContent=sigma.length?'σ bonds (one electron from each hybrid): '+sigma.map(q=>`C${q.a+1} h${q.ha+1}–C${q.b+1} h${q.hb+1}`).join('; '):sigmaOverlaps().length?'Hybrids overlap: add one electron to each overlapping hybrid to form a σ bond.':'No head-on hybrid overlap.';
+  $('sigmaStatus').textContent=sigma.length?'σ connections: '+sigma.map(q=>`C${q.a+1} h${q.ha+1}–C${q.b+1} h${q.hb+1}`).join('; '):'No head-on hybrid overlap: available hybrid lobes can carry terminal 1s orbitals.';
   syncDisplayControls();
   updateAttachmentUI();
   updateSelectedPiStatus();
@@ -981,7 +952,7 @@ function updatePiStatus(){
   if(state.centers.length>2){
     const summary=document.createElement('div');
     summary.style.marginTop='6px';
-    summary.textContent=`All centre pairs: ${bonds.length} π bond${bonds.length===1?'':'s'} formed${bonds.length?' ('+bonds.map(q=>`C${q.a+1} p${q.pai+1}–C${q.b+1} p${q.pbi+1}`).join(', ')+')':''}.`;
+    summary.textContent=`All centre pairs: ${bonds.length} π overlap${bonds.length===1?'':'s'} achieved${bonds.length?' ('+bonds.map(q=>`C${q.a+1} p${q.pai+1}–C${q.b+1} p${q.pbi+1}`).join(', ')+')':''}.`;
     $('piStatus').appendChild(summary);
   }
 }
@@ -997,7 +968,6 @@ function updateSelectedPiStatus(){
   const pct=Math.round(q.score*100),ang=Math.acos(clamp(Math.abs(dot(q.pa,q.pb)),-1,1))*180/Math.PI;
   if(q.lonePair){el.textContent='π bonding unavailable: a p orbital contains a lone pair. Shift-click to remove an electron.';return;}
   if(q.outOfPhase){el.textContent='Out-of-phase p overlap: facing lobes have opposite signs. No bonding π density is shown. Invert the selected p phase on one centre, or use Align π.';return;}
-  if(q.geometryMatched&&q.inPhase&&!q.electronsReady){el.textContent='Aligned π overlap: add one electron to each overlapping p orbital to form a bond.';return;}
   if(q.blocked){el.textContent='π bond unavailable: a required p orbital is already assigned to another π bond. Choose an sp centre with a second p orbital and align it for the next bond.';return;}
   if(q.dist<1e-8){el.textContent='π overlap: separate the coincident centres to define a bond axis.';return;}
   if(q.formed){
@@ -1015,7 +985,6 @@ function updateLegend(){
   if(hybrids&&state.colorMode!=='phase')items.push([state.colorMode==='mono'?'#dce5ee':'#4cc9f0','hybrid orbitals']);
   if(ps&&state.pMode!=='phase')items.push(['#8b5cf6','unhybridized p']);
   if(ss&&state.colorMode!=='phase')items.push([state.colorMode==='mono'?'#dce5ee':'#ffc66d','terminal 1s']);
-  items.push(['#20df88','σ bond formed'],['#ffbd80','π bond formed']);
   $('legend').innerHTML=items.map(([c,t])=>`<span class="legend-item"><span class="swatch" style="background:${c}"></span>${t}</span>`).join('');
 }
 function syncDisplayControls(){
@@ -1064,7 +1033,7 @@ document.querySelectorAll('#hybridButtons button').forEach(btn=>btn.onclick=()=>
 });
 function attachmentIssue(i,h){
   if(electronCount(i,'hybrid',h)===2)return 'lone pair';
-  if(sigmaOverlaps().some(q=>(q.a===i&&q.ha===h)||(q.b===i&&q.hb===h)))return 'already overlapping';
+  if(sigmaConnections().some(q=>(q.a===i&&q.ha===h)||(q.b===i&&q.hb===h)))return 'already bonded';
   return '';
 }
 function attachmentTarget(){
@@ -1093,12 +1062,7 @@ $('pickAttachment').onclick=()=>{state.pickAttachment=!state.pickAttachment;if(s
 $('addCenter').onclick=()=>{
   updateAttachmentUI();if($('addCenter').disabled)return;
   const parent=state.attachCentre,h=state.attachHybrid,{direction,position}=attachmentTarget(),kind=state.newCentreKind;
-  let frame=alignMatrix(orbitalData[kind].vectors[0],mul(direction,-1));
-  if(['sp','sp2'].includes(kind)&&['sp','sp2'].includes(state.centers[parent].kind)){
-    const x=mul(direction,-1),parentNormal=applyM(centerOrientation(parent),[0,0,1]);
-    const z=norm(sub(parentNormal,mul(x,dot(parentNormal,x)))),y=norm(cross(z,x));
-    frame=[[x[0],y[0],z[0]],[x[1],y[1],z[1]],[x[2],y[2],z[2]]];
-  }
+  const frame=alignMatrix(orbitalData[kind].vectors[0],mul(direction,-1));
   state.centers.push({kind,selected:0,selectedP:0,base:mul(position,1/state.spacing),frame,reference:parent,bondHybrid:0,pos:[0,0,0],rot:[0,0,0],torsion:0});
   const child=state.centers.length-1;state.activeCenter=child;state.pickAttachment=false;
   state.overlapPair=centrePairs().findIndex(([a,b])=>a===parent&&b===child);
@@ -1170,13 +1134,12 @@ function electronAnchors(){
 }
 function drawElectrons(m){
   electronHits=[];
-  const bonded=bondedOrbitalKeys();
   for(const a of electronAnchors()){
     const p=project(a.position,m),count=electronCount(a.ci,a.type,a.index);
     ctx.save();ctx.globalAlpha=1;
     for(let k=0;k<count;k++){
       const x=p.x+(count===2?(k===0?-8:8):0);
-      ctx.beginPath();ctx.arc(x,p.y,6,0,Math.PI*2);ctx.fillStyle=bonded.has(`${a.ci}:${a.type}:${a.index}`)?(a.type==='p'?'#ffbd80':'#20df88'):'#ffe66d';ctx.fill();ctx.lineWidth=2;ctx.strokeStyle='#172033';ctx.stroke();
+      ctx.beginPath();ctx.arc(x,p.y,6,0,Math.PI*2);ctx.fillStyle='#ffe66d';ctx.fill();ctx.lineWidth=2;ctx.strokeStyle='#172033';ctx.stroke();
       electronHits.push({...a,x,y:p.y});
     }
     if(count===2&&state.showLabels){ctx.textAlign='center';ctx.font='bold 11px system-ui';ctx.lineWidth=3;ctx.strokeStyle=state.light?'#fff':'#172033';ctx.strokeText('lone pair',p.x,p.y+22);ctx.fillStyle=state.light?'#17283a':'#ffe66d';ctx.fillText('lone pair',p.x,p.y+22);}
@@ -1204,8 +1167,6 @@ function editOrbitalElectron(hit,remove=false){
   $('electronStatus').textContent=`C${hit.ci+1} ${label}: ${count} electron${count===1?'':'s'}${count===2?' — lone pair; excluded from bonding.':'.'}`;
   activateCenter(hit.ci);refreshDisplay();
 }
-$('bondVolume').oninput=e=>{$('bondVolumeVal').textContent=e.target.value+'%';};
-$('bondSound').onchange=()=>{if($('bondSound').checked){try{const Audio=window.AudioContext||window.webkitAudioContext;if(Audio){audioContext??=new Audio();audioContext.resume().catch(()=>{});}}catch(e){}}};
 $('editElectrons').onchange=e=>state.editElectrons=e.target.checked;
 $('clearElectrons').onclick=()=>{state.centers.forEach(c=>{c.electrons={};c.electronLobes={}});$('electronStatus').textContent='Electron dots cleared.';refreshDisplay()};
 function pickCenter(clientX,clientY){

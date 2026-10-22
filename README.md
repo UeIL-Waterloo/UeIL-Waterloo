@@ -8,14 +8,17 @@ A complete static website, ready for a GitHub repository and GitHub Pages. No bu
 | --- | --- |
 | `index.html` | Homepage, research, image gallery, publication highlights, people and contact |
 | `publications.html` | Complete 94-entry CV bibliography |
+| `spotlight.html` | Data-driven archive of in-depth research spotlights |
 | `assets/css/style.css` | Responsive styles for both pages |
 | `assets/js/content.js` | Editable team roster and 16 themed publication highlights |
 | `assets/js/app.js` | Homepage filters, search, navigation and credits |
 | `assets/js/figures.js` | Enlarged publication figure viewer |
 | `assets/js/publications.js` | Complete bibliography search and filters |
+| `assets/js/spotlights.js` | Renders research spotlight stories and figure viewers |
 | `assets/images/` | Optimized publication figures, including diffraction dynamics |
 | `assets/images/people/` | Place future member portraits here |
-| `data/cv-publications.json` | Bibliography transcription for future editing |
+| `data/publications.json` | Complete bibliography records, including citation emphasis and links |
+| `data/research-spotlights.json` | Research spotlight stories, figures and optional data links |
 | `data/figure-sources.json` | Additional figure provenance |
 | `IMAGE-CREDITS.md` | Full list of image sources |
 | `.nojekyll` | Serves the site as plain static files on GitHub Pages |
@@ -72,11 +75,85 @@ These image paths are relative to `index.html`, not to the JavaScript file. Empt
 
 ### Publication highlights
 
-Edit the `publications` array in `assets/js/content.js`. Theme names must match the filter buttons in `index.html`. Current totals are 5 Ultrafast dynamics, 6 Quantum materials and 5 Liquid microscopy. Totals are dynamically calculated, but double check correctness. Use a verified `doi`, or an internal `citationUrl` pointing to a bibliography entry. Keep conference proceedings labelled in `kind`.
+Edit the `publications` array in `assets/js/content.js`. Theme names must match the filter buttons in `index.html`. Current totals are 5 Ultrafast dynamics, 6 Quantum materials and 5 Liquid-phase microscopy. Totals are dynamically calculated, but double check correctness. Use a verified `doi` for an external paper link. For a highlight without a DOI, set `citationTitle` and `citationCategory` to match the corresponding record in `data/publications.json`; the homepage resolves its descriptive anchor automatically, so do not copy or construct a publication URL or ID. Keep conference proceedings labelled in `kind`.
 
 ### Complete bibliography
 
-The displayed complete list is authored directly in `publications.html`. JavaScript calculates the overall and per-category entry counts and the filtered result count from `data/cv-publications.json` when the page loads. It verifies that each JSON record matches the corresponding page entry before showing counts. The JSON does **not** automatically regenerate citation markup, so update both when changing records. Preserve existing `cv-entry-*` IDs because highlights link to them. Serve the site over HTTP(S) so the page can load the JSON file.
+The complete bibliography is rendered from `data/publications.json` when the page loads, in the same order as its records. Serve the site over HTTP(S) so the page can load the JSON file.
+
+#### Adding or editing an entry
+
+Add a record to the `entries` array in `data/publications.json`. Its position in the array controls where it appears; moving a record does not change its anchor. Give every new record a unique, descriptive `cv-*` ID based on the paper's title (and, when useful, its year or category). Keep that ID unchanged when editing or reordering the entry, since publication highlights and external links may point to it. Numeric or other legacy aliases are not used.
+
+Each record uses this structure:
+
+```json
+{
+  "id": "cv-example-paper-title-2027-journal-articles",
+  "category": "Journal articles",
+  "year": "2027",
+  "status": "",
+  "citation": [
+    { "text": "A. Author, ", "member": false },
+    { "text": "B. Student", "member": true },
+    { "text": ", and C. Author. “Example paper title”. Journal 12, 34 (2027).", "member": false }
+  ],
+  "link": "https://doi.org/10.0000/example",
+  "linkText": "Read publication ↗"
+}
+```
+
+Use `member: true` only for author names that should be underlined; keep punctuation and spaces in the appropriate citation segments. Use an empty string for `status` when there is no badge, or provide a status such as `"In press"`, `"Submitted"`, or `"Under review"`. For entries without a link, set `link` to `null` and `linkText` to an empty string. Use the existing category names so the category filter and totals continue to work.
+
+If a homepage highlight links to an entry without a DOI, also set that bibliography record's `title` to its publication title. The highlight's `citationTitle`, year, and `citationCategory` are matched to this record; its `id` is used only to create the final page anchor. The `title` field is only required for records referenced by a homepage highlight.
+
+### Research spotlights
+
+The homepage links to the separate [Research Spotlights page](./spotlight.html). Its entries are rendered from `data/research-spotlights.json`; add a new object to the `entries` array to publish another story. The array order is the display order. Copy an existing object and replace the text and assets—no HTML changes are needed.
+
+Each spotlight has a unique lowercase `id`, `date`, `title`, short `summary`, and a `paragraphs` array. The optional `author` field adds a byline only when present. Use `figures` to choose one or more existing images from `assets/images/` and provide their alt text, viewer title/caption, citation, and optional DOI. Figure `label` and `credit` are optional display text. Add an optional `datasets` array for files or external data links; each item has a `title` and `url`, with optional `format` and `description`. The optional `publication` object adds a DOI link for the story.
+
+Example structure (all text is plain text; do not add HTML tags):
+
+```json
+{
+  "id": "example-study-2027",
+  "date": "2027",
+  "title": "A clear title for the story",
+  "author": "Optional author or team name",
+  "summary": "A short introduction to the finding.",
+  "paragraphs": [
+    "Describe the question and approach.",
+    "Explain the result and why it matters."
+  ],
+  "figures": [
+    {
+      "image": "assets/images/example-figure.webp",
+      "alt": "Describe the scientific content and any meaningful labels.",
+      "title": "Short figure title",
+      "caption": "Explain what the figure shows.",
+      "citation": "Full source citation for the figure.",
+      "doi": "10.0000/example",
+      "credit": "Figure 1 · Example et al. (2027)",
+      "label": "OPTIONAL FIGURE LABEL"
+    }
+  ],
+  "datasets": [
+    {
+      "title": "Download the measurement data",
+      "url": "assets/data/example.csv",
+      "format": "CSV",
+      "description": "Processed time-resolved measurements"
+    }
+  ],
+  "publication": {
+    "label": "Read the paper",
+    "doi": "10.0000/example"
+  }
+}
+```
+
+Omit `author`, `datasets`, or `publication` when they are not needed. For figures without a DOI, omit `doi`; keep the full citation so it remains available in the enlarged figure viewer. Add any new image or data file under `assets/` or `data/` and use its path from the site root.
 
 ### Figures
 
