@@ -159,6 +159,10 @@ header {
   line-height:1.2;
   letter-spacing:-.04em
 }
+.brand>span:last-child {
+  font-size:18px;
+  line-height:1.15
+}
 .brand small {
   font-size:12px;
   font-size:var(--type-caption);
@@ -251,7 +255,7 @@ nav>a:focus-visible {
   display:none;
   position:absolute;
   top:100%;
-  left:-12px;
+  left:0;
   z-index:11;
   min-width:205px;
   padding:8px;
@@ -342,6 +346,45 @@ nav>a:focus-visible {
 }
 .menu-toggle {
   display:none
+}
+@media(min-width:1101px) {
+  header>nav {
+    gap:10px;
+    align-items:stretch;
+    font-size:15px
+  }
+  header>nav>.publications-nav,
+  header>nav>.education-dropdown {
+    display:flex;
+    align-items:stretch
+  }
+  header>nav>a,
+  header>nav>.publications-nav>a,
+  header>nav>.education-dropdown>summary,
+  header>nav>.nav-contact {
+    min-height:42px;
+    padding:9px 12px
+  }
+  header>nav>.publications-nav>a,
+  header>nav>.education-dropdown>summary {
+    gap:9px
+  }
+  header .publications-menu {
+    min-width:230px;
+    padding:10px
+  }
+  header .publications-menu a,
+  header .education-links a {
+    padding:10px 12px;
+    line-height:1.35
+  }
+  header .education-links {
+    min-width:290px;
+    padding:10px
+  }
+  header .education-links small {
+    padding:8px 12px 5px
+  }
 }
 .hero {
   display:grid;
@@ -526,8 +569,8 @@ nav>a:focus-visible {
   transform:scale(1.035)
 }
 .topic-number {
-  font-size:12px;
-  font-size:var(--type-caption);
+  font-size:16px;
+  font-size:var(--type-body);
   letter-spacing:.12em;
   color:#667957
 }
@@ -1092,10 +1135,6 @@ dialog li {
   header {
     height:80px
   }
-  .brand {
-    font-size:20px;
-    font-size:var(--type-title-sm)
-  }
   .mark {
     width:56px;
     height:44px;
@@ -1217,10 +1256,6 @@ dialog li {
 @media(max-width:800px) {
   header {
     height:80px
-  }
-  .brand {
-    font-size:20px;
-    font-size:var(--type-title-sm)
   }
   .mark {
     width:56px;
@@ -2146,6 +2181,14 @@ nav [aria-current=page] {
 #pi .pi-bio h2 {
   font-size:var(--type-title-lg)
 }
+#pi .pi-bio>h2,
+#pi .pi-bio>.pi-role {
+  text-align:center
+}
+#pi .pi-bio>h2 {
+  margin-left:auto;
+  margin-right:auto
+}
 #research .section-heading h2 {
   margin-left:auto;
   margin-right:auto;
@@ -2174,9 +2217,6 @@ nav [aria-current=page] {
   width:min(100%,var(--reading-measure));
   margin-left:auto;
   margin-right:auto
-}
-.section-heading h2 {
-  max-width:24ch
 }
 .section-heading>p {
   width:100%;
@@ -2744,20 +2784,6 @@ nav [aria-current=page] {
   font-size:inherit;
   margin-left:0
 }
-.site-footer .footer-name-full {
-  display:none
-}
-.site-footer .footer-name-compact {
-  display:inline
-}
-@media(min-width:680px) {
-  .site-footer .footer-name-full {
-    display:inline
-  }
-  .site-footer .footer-name-compact {
-    display:none
-  }
-}
 .site-footer .footer-affiliations {
   display:grid;
   grid-template-columns:repeat(3,minmax(0,1fr));
@@ -2787,17 +2813,6 @@ nav [aria-current=page] {
   background:none;
   text-align:center;
   overflow-wrap:anywhere
-}
-.site-footer .footer-affiliation-compact {
-  display:none
-}
-@media(max-width:600px) {
-  .site-footer .footer-affiliation-full {
-    display:none
-  }
-  .site-footer .footer-affiliation-compact {
-    display:inline
-  }
 }
 .site-footer .footer-affiliations a:hover,
 .site-footer .footer-affiliations a:focus-visible {
