@@ -179,10 +179,83 @@ document.querySelectorAll('[data-people]').forEach(button => {
 });
 
 const credits = document.querySelector('#credits');
+const imageCreditsList = document.querySelector('#image-credits-list');
+const imageCreditsError = document.querySelector('#image-credits-error');
+let imageCreditsPromise;
+let imageCreditsRendered = false;
+
+function renderImageCredits(publicationsList) {
+  const figureEntries = publicationsList.flatMap(publication => {
+    if (publication.figures === undefined) {
+      return [];
+    }
+    if (
+      !Array.isArray(publication.figures) ||
+      publication.figures.some(figure =>
+        !figure ||
+        typeof figure.id !== 'string' ||
+        typeof figure.src !== 'string' ||
+        typeof figure.credit !== 'string' ||
+        typeof figure.figure !== 'string',
+      ) ||
+      !Array.isArray(publication.citation) ||
+      publication.citation.some(segment => !segment || typeof segment.text !== 'string') ||
+      (publication.link !== null && typeof publication.link !== 'string')
+    ) {
+      throw new Error(`Publication "${publication.id}" has invalid figure credit data`);
+    }
+    return publication.figures.map(figure => ({ publication, figure }));
+  });
+  const items = figureEntries.map(({ publication, figure }) => {
+    const item = document.createElement('li');
+    const label = document.createElement('strong');
+    label.textContent = `${figure.credit}: `;
+    item.appendChild(label);
+    const citation = publication.citation.map(segment => segment.text).join('');
+    item.appendChild(document.createTextNode(`${citation} ${figure.figure}. `));
+
+    if (publication.link) {
+      const link = document.createElement('a');
+      link.href = publication.link;
+      link.target = '_blank';
+      link.rel = 'noopener';
+      link.textContent = publication.link.startsWith('https://doi.org/')
+        ? 'DOI ↗'
+        : publication.linkText || 'Read publication ↗';
+      item.appendChild(link);
+    }
+    return item;
+  });
+  imageCreditsList.replaceChildren(...items);
+}
+
+function loadImageCredits() {
+  if (imageCreditsRendered) {
+    return;
+  }
+
+  if (!imageCreditsPromise) {
+    imageCreditsError.hidden = true;
+    imageCreditsList.replaceChildren(document.createTextNode('Loading image credits…'));
+    imageCreditsPromise = loadBibliography()
+      .then(entries => renderImageCredits(entries))
+      .then(() => {
+        imageCreditsRendered = true;
+      })
+      .catch(error => {
+        imageCreditsList.replaceChildren();
+        imageCreditsError.hidden = false;
+        console.error('Unable to load image credits from data/publications.json.', error);
+      });
+  }
+
+  return imageCreditsPromise;
+}
 
 document.querySelector('#credits-open').addEventListener('click', event => {
   event.preventDefault();
   credits.showModal();
+  loadImageCredits();
 });
 
 credits.querySelector('.close').addEventListener('click', () => credits.close());

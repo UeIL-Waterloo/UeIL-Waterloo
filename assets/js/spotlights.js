@@ -13,7 +13,7 @@ function appendText(parent, tagName, className, text) {
   return element;
 }
 
-function renderFigure(figure) {
+function renderFigure(figure, publicationFigure, publication) {
   const item = document.createElement('figure');
   item.className = 'spotlight-figure';
   if (figure.label) {
@@ -25,12 +25,15 @@ function renderFigure(figure) {
   button.type = 'button';
   button.dataset.figureTitle = figure.title;
   button.dataset.figureCaption = figure.caption;
-  button.dataset.figureCitation = figure.citation;
-  button.dataset.figureDoi = figure.doi || '';
+  button.dataset.figureCitation = publication.citation.map(segment => segment.text).join('');
+  button.dataset.figureDoi = typeof publication.link === 'string' &&
+    publication.link.startsWith('https://doi.org/')
+    ? publication.link.slice('https://doi.org/'.length)
+    : '';
   button.setAttribute('aria-label', `Enlarge figure: ${figure.title}`);
 
   const image = document.createElement('img');
-  image.src = figure.image;
+  image.src = publicationFigure.src;
   image.alt = figure.alt;
   image.loading = 'lazy';
   button.appendChild(image);
@@ -137,8 +140,16 @@ function renderSpotlight(entry, publication) {
 
   const figures = document.createElement('div');
   figures.className = 'spotlight-figures';
+  const publicationFigures = new Map(
+    (publication && publication.figures ? publication.figures : [])
+      .map(figure => [figure.id, figure]),
+  );
   entry.figures.forEach(figure => {
-    figures.appendChild(renderFigure(figure));
+    figures.appendChild(renderFigure(
+      figure,
+      publicationFigures.get(figure.publicationFigureId),
+      publication,
+    ));
   });
   content.appendChild(figures);
   panel.appendChild(content);
@@ -185,12 +196,11 @@ async function loadSpotlights() {
         !Array.isArray(entry.figures) ||
         entry.figures.some(figure =>
           !figure ||
-          typeof figure.image !== 'string' ||
+          typeof figure.publicationFigureId !== 'string' ||
           typeof figure.alt !== 'string' ||
           typeof figure.title !== 'string' ||
           typeof figure.caption !== 'string' ||
-          typeof figure.credit !== 'string' ||
-          typeof figure.citation !== 'string',
+          typeof figure.credit !== 'string',
         ) ||
         (entry.author !== undefined && typeof entry.author !== 'string') ||
         (entry.publicationId !== undefined && typeof entry.publicationId !== 'string') ||
@@ -200,11 +210,6 @@ async function loadSpotlights() {
       }
       ids.add(entry.id);
       entry.datasets = entry.datasets || [];
-      entry.figures.forEach((figure, figureIndex) => {
-        if (figure.doi !== undefined && typeof figure.doi !== 'string') {
-          throw new Error(`Figure ${figureIndex + 1} in spotlight ${entry.id} has an invalid DOI`);
-        }
-      });
       entry.datasets.forEach((dataset, datasetIndex) => {
         if (
           !dataset ||
@@ -222,11 +227,22 @@ async function loadSpotlights() {
           !publication ||
           !Array.isArray(publication.citation) ||
           publication.citation.some(segment => !segment || typeof segment.text !== 'string') ||
-          typeof publication.link !== 'string' ||
-          typeof publication.linkText !== 'string'
+          (publication.link !== null && typeof publication.link !== 'string') ||
+          typeof publication.linkText !== 'string' ||
+          !Array.isArray(publication.figures) ||
+          publication.figures.some(figure =>
+            !figure ||
+            typeof figure.id !== 'string' ||
+            typeof figure.src !== 'string',
+          ) ||
+          entry.figures.some(figure =>
+            !publication.figures.some(sourceFigure => sourceFigure.id === figure.publicationFigureId),
+          )
         ) {
           throw new Error(`Publication ${entry.publicationId} referenced by spotlight ${entry.id} is invalid`);
         }
+      } else if (entry.figures.length > 0) {
+        throw new Error(`Spotlight ${entry.id} figures must use shared publication figure credits`);
       }
     }
 

@@ -169,20 +169,21 @@ header {
 .mark {
   font-family:Georgia,serif;
   font-family:var(--font-serif);
-  font-size:56px;
-  font-size:var(--type-display-compact);
+  display:flex;
+  align-items:center;
+  justify-content:center;
+  font-size:20px;
   line-height:1;
-  border:1px solid var(--ink);
-  width:52px;
+  color:var(--ink);
+  border:1px solid #b5cc89;
+  background:#e8eddd;
+  width:64px;
   height:52px;
   text-align:center
 }
-.mark span {
-  color:#8aa16a
-}
 nav {
   display:flex;
-  gap:16px;
+  gap:12px;
   align-items:center;
   font-size:12px;
   font-size:var(--type-caption)
@@ -286,8 +287,7 @@ nav>a:focus-visible {
 }
 .education-dropdown {
   position:relative;
-  order:2;
-  margin-left:auto
+  margin-left:8px
 }
 .education-dropdown summary {
   display:flex;
@@ -314,7 +314,8 @@ nav>a:focus-visible {
   box-shadow:0 12px 30px #17392f1a
 }
 .education-dropdown[open] .education-links {
-  display:block
+  display:block;
+  margin-top:8px
 }
 .education-links a {
   display:block;
@@ -331,7 +332,6 @@ nav>a:focus-visible {
   font-size:var(--type-caption)
 }
 .nav-contact {
-  order:1;
   border:1px solid var(--line);
   padding:8px 10px;
   display:flex;
@@ -417,7 +417,7 @@ nav>a:focus-visible {
 }
 .figure-heading {
   display:flex;
-  justify-content:space-between;
+  justify-content:center;
   font-size:12px;
   font-size:var(--type-caption);
   letter-spacing:.11em;
@@ -888,11 +888,6 @@ nav>a:focus-visible {
   gap:130px;
   align-items:center
 }
-.contact h2 {
-  font-size:64px;
-  font-size:var(--type-display-mobile);
-  margin:24px 0
-}
 .contact p:not(.eyebrow) {
   max-width:450px;
   font-size:14px;
@@ -921,7 +916,7 @@ nav>a:focus-visible {
   font-size:var(--type-body);
   color:var(--paper);
   font-weight:500;
-  margin:22px 0 9px
+  margin:0 0 9px
 }
 .contact-rule {
   height:1px;
@@ -1102,10 +1097,9 @@ dialog li {
     font-size:var(--type-title-sm)
   }
   .mark {
-    width:44px;
+    width:56px;
     height:44px;
-    font-size:44px;
-    font-size:var(--type-heading-xl)
+    font-size:18px
   }
   .menu-toggle {
     display:block;
@@ -1134,7 +1128,7 @@ dialog li {
     align-items:center;
     font-size:14px;
     font-size:var(--type-small);
-    gap:0;
+    gap:4px;
     text-align:center
   }
   nav.open {
@@ -1148,7 +1142,7 @@ dialog li {
   nav>a {
     width:100%;
     min-height:28px;
-    margin:1px 0;
+    margin:0;
     padding:4px 10px
   }
   .publications-nav {
@@ -1158,7 +1152,7 @@ dialog li {
   .publications-nav>a {
     width:100%;
     min-height:28px;
-    margin:1px 0;
+    margin:0;
     padding:4px 10px
   }
   .publications-menu {
@@ -1166,7 +1160,7 @@ dialog li {
     position:static;
     width:100%;
     min-width:0;
-    margin:0 0 3px;
+    margin:0;
     padding:0 4px;
     text-align:center;
     box-shadow:none
@@ -1184,7 +1178,7 @@ dialog li {
   .education-dropdown {
     align-self:stretch;
     width:100%;
-    margin-left:0;
+    margin:0;
     padding:0
   }
   .education-dropdown summary {
@@ -1198,7 +1192,7 @@ dialog li {
     position:static;
     width:100%;
     min-width:0;
-    margin:0 0 3px;
+    margin:4px 0 0;
     padding:4px;
     text-align:center;
     box-shadow:none
@@ -1217,7 +1211,7 @@ dialog li {
     justify-content:center;
     min-height:28px;
     padding:4px 10px;
-    margin:2px auto 0
+    margin:0 auto
   }
 }
 @media(max-width:800px) {
@@ -1229,10 +1223,9 @@ dialog li {
     font-size:var(--type-title-sm)
   }
   .mark {
-    width:44px;
+    width:56px;
     height:44px;
-    font-size:44px;
-    font-size:var(--type-heading-xl)
+    font-size:18px
   }
   .brand small {
     font-size:12px;
@@ -1263,7 +1256,7 @@ dialog li {
     align-items:center;
     font-size:14px;
     font-size:var(--type-small);
-    gap:0;
+    gap:4px;
     text-align:center
   }
   nav.open {
@@ -1277,7 +1270,7 @@ dialog li {
   nav>a {
     width:100%;
     min-height:28px;
-    margin:1px 0;
+    margin:0;
     padding:4px 10px
   }
   .publications-nav {
@@ -1287,7 +1280,7 @@ dialog li {
   .publications-nav>a {
     width:100%;
     min-height:28px;
-    margin:1px 0;
+    margin:0;
     padding:4px 10px
   }
   .publications-menu {
@@ -1295,7 +1288,7 @@ dialog li {
     position:static;
     width:100%;
     min-width:0;
-    margin:0 0 3px;
+    margin:0;
     padding:0 4px;
     text-align:center;
     box-shadow:none
@@ -1313,7 +1306,7 @@ dialog li {
   .education-dropdown {
     align-self:stretch;
     width:100%;
-    margin-left:0;
+    margin:0;
     padding:0
   }
   .education-dropdown summary {
@@ -1327,7 +1320,7 @@ dialog li {
     position:static;
     width:100%;
     min-width:0;
-    margin:0 0 3px;
+    margin:4px 0 0;
     padding:4px;
     text-align:center;
     box-shadow:none
@@ -1346,7 +1339,7 @@ dialog li {
     justify-content:center;
     min-height:28px;
     padding:4px 10px;
-    margin:2px auto 0
+    margin:0 auto
   }
   .hero {
     grid-template-columns:1fr;
@@ -1449,10 +1442,6 @@ dialog li {
   .contact-grid {
     gap:35px
   }
-  .contact h2 {
-    font-size:56px;
-    font-size:var(--type-display-compact)
-  }
 }
 @media(max-width:540px) {
   html {
@@ -1471,10 +1460,10 @@ dialog li {
     overflow-wrap:anywhere
   }
   .mark {
-    flex:0 0 38px;
-    width:38px;
+    flex:0 0 52px;
+    width:52px;
     height:38px;
-    font-size:38px
+    font-size:17px
   }
   .menu-toggle {
     flex-shrink:0;
@@ -1591,10 +1580,6 @@ dialog li {
   .contact-grid {
     grid-template-columns:1fr;
     gap:48px
-  }
-  .contact h2 {
-    font-size:56px;
-    font-size:var(--type-display-compact)
   }
   .contact address {
     border-top:1px solid #4b665b;
@@ -2143,11 +2128,28 @@ nav [aria-current=page] {
   }
 }
 :root {
-  --reading-measure:68ch
+  --reading-measure:60ch
 }
 .section-top {
   display:block;
   margin-bottom:22px
+}
+#research .section-top .eyebrow,
+#publications .section-top .eyebrow,
+#people .section-top .eyebrow,
+#pi .pi-bio>.eyebrow,
+#contact .contact-grid>.eyebrow {
+  font-size:var(--type-title-md);
+  text-align:center
+}
+#research .section-heading h2,
+#pi .pi-bio h2 {
+  font-size:var(--type-title-lg)
+}
+#research .section-heading h2 {
+  margin-left:auto;
+  margin-right:auto;
+  text-align:center
 }
 .section-top .section-note {
   display:block;
@@ -2159,11 +2161,26 @@ nav [aria-current=page] {
   max-width:var(--reading-measure);
   margin-bottom:40px
 }
+#research .section-heading,
+#publications .section-heading,
+#people .section-heading {
+  width:min(100%,var(--reading-measure));
+  margin-left:auto;
+  margin-right:auto
+}
+#research .section-top,
+#publications .section-top,
+#people .section-top {
+  width:min(100%,var(--reading-measure));
+  margin-left:auto;
+  margin-right:auto
+}
 .section-heading h2 {
   max-width:24ch
 }
 .section-heading>p {
-  max-width:68ch;
+  width:100%;
+  max-width:100%;
   margin-top:20px
 }
 .hero-copy,.pi-bio,.contact-grid>div,.gallery-copy {
@@ -2308,15 +2325,34 @@ nav [aria-current=page] {
 }
 .contact-grid {
   grid-template-columns:minmax(0,1fr) minmax(250px,.72fr);
-  gap:64px;
+  column-gap:64px;
+  row-gap:24px;
   align-items:start
+}
+#contact .contact-grid>.eyebrow {
+  grid-column:1/-1
 }
 .contact-grid>div,.contact-grid address {
   max-width:58ch;
   text-align:left
 }
-.contact h2 {
-  max-width:16ch
+.contact-heading {
+  display:block;
+  margin:0 0 24px;
+  color:var(--paper);
+  font-family:var(--font-serif);
+  font-size:var(--type-title-lg);
+  font-weight:400;
+  letter-spacing:normal;
+  line-height:1.2;
+  max-width:none;
+  text-align:center;
+  text-transform:none
+}
+#contact .contact-grid>div>.button {
+  display:table;
+  margin-left:auto;
+  margin-right:auto
 }
 .contact-grid address {
   justify-self:stretch
@@ -2339,6 +2375,15 @@ nav [aria-current=page] {
   border-bottom:1px solid #c2cdba
 }
 @media(max-width:800px) {
+  .contact-grid>div,.contact-grid address {
+    margin-left:auto;
+    margin-right:auto;
+    text-align:center
+  }
+  .contact p:not(.eyebrow) {
+    margin-left:auto;
+    margin-right:auto
+  }
   .section-heading {
     max-width:68ch
   }
@@ -2830,10 +2875,19 @@ nav [aria-current=page] {
   justify-content:center;
   width:100%
 }
+#people .people-tabs {
+  justify-content:center;
+  width:100%
+}
 .publications .publication-controls .search {
   width:min(100%,36rem);
   margin:0 auto
 }
 .publications #result-count {
   text-align:center
+}
+@media(max-width:1100px) {
+  nav.open .nav-contact+.education-dropdown {
+    margin-top:8px
+  }
 }

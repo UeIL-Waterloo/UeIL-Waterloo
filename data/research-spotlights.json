@@ -11,24 +11,20 @@
       ],
       "figures": [
         {
-          "image": "assets/images/diffraction-dynamics.webp",
+          "publicationFigureId": "nbte2-diffraction-dynamics",
           "alt": "Measured changes in NbTe₂ diffraction: the left half shows approximately 200 fs and the right half shows later than 3 ps after excitation. Red and blue spots show intensity increases and decreases.",
           "title": "How NbTe₂ diffraction changes after excitation",
           "caption": "Differential diffraction images at approximately 200 fs and later than 3 ps after excitation. Red indicates increased intensity; blue indicates decreased intensity.",
           "label": "LIGHT-INDUCED STRUCTURAL DYNAMICS",
-          "credit": "Differential diffraction after photoexcitation.",
-          "citation": "C. Viernes, S. Netzke, D. Sutarma, R. Zheng, L. Daniel, T. Lott, K. Pichugin, M. Schleberger, P. Kratzer, G. Sciaini. “Tracking Nuclear and Electronic Orders in a Charge-Density-Wave Phase.” Ultrafast Science 6, 0200 (2026).",
-          "doi": "10.34133/ultrafastscience.0200"
+          "credit": "Differential diffraction after photoexcitation."
         },
         {
-          "image": "assets/images/diffraction-time-traces.webp",
+          "publicationFigureId": "nbte2-diffraction-time-traces",
           "alt": "Published time traces show changes in Bragg and charge-density-wave peak intensities and their two strongest SVD components over the first few picoseconds.",
           "title": "Time-resolved diffraction intensity changes",
           "caption": "Selected Bragg and charge-density-wave peak intensities, and the two leading singular-value-decomposition components.",
           "label": "FOLLOWING THE RESPONSE IN TIME",
-          "credit": "Peak intensities and dominant temporal components.",
-          "citation": "C. Viernes, S. Netzke, D. Sutarma, R. Zheng, L. Daniel, T. Lott, K. Pichugin, M. Schleberger, P. Kratzer, G. Sciaini. “Tracking Nuclear and Electronic Orders in a Charge-Density-Wave Phase.” Ultrafast Science 6, 0200 (2026).",
-          "doi": "10.34133/ultrafastscience.0200"
+          "credit": "Peak intensities and dominant temporal components."
         }
       ],
       "datasets": [],
@@ -42,14 +38,12 @@
       "paragraphs": [],
       "figures": [
         {
-          "image": "assets/images/zno-interfaces.webp",
+          "publicationFigureId": "zno-interfaces",
           "alt": "Published figure comparing synthesis methods, surface composition and atomic models of WS2 on two ZnO surfaces.",
           "title": "Interfaces shape exciton dynamics",
           "caption": "Growth methods and atomistic interface models for monolayer WS₂ on single-crystalline and polycrystalline ZnO.",
           "label": "2D MATERIALS / 2026",
-          "credit": "Published comparison of synthesis methods, surface composition and atomic interface models.",
-          "citation": "O. Kharsah, D. Sutarma, L. Daniel, D. Vidish, R. Zheng, S. Netzke, J. von Kuczkowski, U. Hagemann, M. Abdelbaky, S. Ustenko, W. Mertin, G. Bacher, G. Sciaini, P. Kratzer, K. Musselman, M. Schleberger. “ZnO Surface Morphology and Chemistry Govern Exciton Dynamics in WS₂/ZnO Heterostructures.” ACS Applied Electronic Materials 8, 5077–5089 (2026).",
-          "doi": "10.1021/acsaelm.6c00496"
+          "credit": "Published comparison of synthesis methods, surface composition and atomic interface models."
         }
       ],
       "datasets": [],
@@ -63,14 +57,12 @@
       "paragraphs": [],
       "figures": [
         {
-          "image": "assets/images/shaped-cathode.webp",
+          "publicationFigureId": "shaped-cathode",
           "alt": "CAD cross-section of a shaped photocathode and magnetic lens with a magnified cathode profile and a 6-centimetre scale bar.",
           "title": "Designing shorter electron pulses",
           "caption": "A shaped photocathode uses geometric field enhancement in a proposed compact electron-source design.",
           "label": "INSTRUMENT DEVELOPMENT / 2017",
-          "credit": "Proposed shaped photocathode and compact electron-source design.",
-          "citation": "A. A. Petruk, K. Pichugin, and G. Sciaini. “Shaped Cathodes for the Production of Ultra-Short Multi-Electron Pulses.” Structural Dynamics 4, 044005 (2017).",
-          "doi": "10.1063/1.4974779"
+          "credit": "Proposed shaped photocathode and compact electron-source design."
         }
       ],
       "datasets": [],
@@ -84,14 +76,12 @@
       "paragraphs": [],
       "figures": [
         {
-          "image": "assets/images/mote2-switching.webp",
+          "publicationFigureId": "mote2-switching",
           "alt": "MoTe2 crystal structures, shear phonon, specimen micrograph with a 10-micrometre scale bar and laser-induced phase transformation scheme.",
           "title": "Light writes a persistent material state",
           "caption": "Crystal structures, a thin-film specimen and the optical and thermal pathways linking phases of MoTe₂.",
           "label": "PHOTOINDUCED PHASES / 2022",
-          "credit": "Published overview of crystal structures, specimen and photoinduced phase pathways.",
-          "citation": "M. Cheng, S. Zhong, N. Rivas, T. Dekker, A. A. Petruk, P. Gicala, K. Pichugin, F. Chen, X. Luo, Y. Sun, A. W. Tsen, and G. Sciaini. “Persistent Photogenerated State Attained by Femtosecond Laser Irradiation of Thin Td-MoTe₂.” The Journal of Physical Chemistry C 126, 13840 (2022).",
-          "doi": "10.1021/acs.jpcc.2c03987"
+          "credit": "Published overview of crystal structures, specimen and photoinduced phase pathways."
         }
       ],
       "datasets": [],
@@ -105,14 +95,12 @@
       "paragraphs": [],
       "figures": [
         {
-          "image": "assets/images/solvated-electron.webp",
+          "publicationFigureId": "solvated-electron",
           "alt": "Four published panels showing an aqueous molecular simulation, electron-density map, calculated energies and repulsive Coulomb barrier model.",
           "title": "An electron held behind a barrier",
           "caption": "Molecular simulations and an energy-landscape model explore photoelectron trapping around an aqueous dianion.",
           "label": "MOLECULAR PHOTOPHYSICS / 2019",
-          "credit": "Published simulation panels and energy landscape for photoelectron trapping.",
-          "citation": "M. Cheng, N. Rivas, S. J. Lim, K. Pichugin, A. A. Petruk, A. Klinkova, R. Smith, W. S. Hopkins, and G. Sciaini. “Trapping a Photoelectron Behind a Repulsive Coulomb Barrier in Solution.” The Journal of Physical Chemistry Letters 10, 5742 (2019).",
-          "doi": "10.1021/acs.jpclett.9b01712"
+          "credit": "Published simulation panels and energy landscape for photoelectron trapping."
         }
       ],
       "datasets": [],

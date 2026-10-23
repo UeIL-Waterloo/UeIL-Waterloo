@@ -19,7 +19,6 @@ A complete static website, ready for a GitHub repository and GitHub Pages. No bu
 | `assets/images/people/` | Place future member portraits here |
 | `data/publications.json` | Complete bibliography records, including citation emphasis and links |
 | `data/research-spotlights.json` | Research spotlight stories, figures and optional data links |
-| `data/figure-sources.json` | Additional figure provenance |
 | `IMAGE-CREDITS.md` | Full list of image sources |
 | `.nojekyll` | Serves the site as plain static files on GitHub Pages |
 
@@ -77,6 +76,10 @@ These image paths are relative to `index.html`, not to the JavaScript file. Empt
 
 Edit the `publications` array in `assets/js/content.js`. Theme names must match the filter buttons in `index.html`. Current totals are 5 Ultrafast dynamics, 6 Quantum materials and 5 Liquid-phase microscopy. Totals are dynamically calculated, but double check correctness. Use a verified `doi` for an external paper link. For a highlight without a DOI, set `citationTitle` and `citationCategory` to match the corresponding record in `data/publications.json`; the homepage resolves its descriptive anchor automatically, so do not copy or construct a publication URL or ID. Keep conference proceedings labelled in `kind`.
 
+### Image credits
+
+Image credits for the site are maintained in `data/publications.json`, under the publication they belong to. Add each image to that record's optional `figures` array with a unique `id`, its `src` path, a `credit` label and a `figure` reference. The credits popup uses the publication's citation and links to its source when available. Add image metadata such as `alt`, `title` and `caption` there too when useful. Reuse the same publication figure record anywhere that image appears so its source and credit stay shared.
+
 ### Complete bibliography
 
 The complete bibliography is rendered from `data/publications.json` when the page loads, in the same order as its records. Serve the site over HTTP(S) so the page can load the JSON file.
@@ -105,13 +108,28 @@ Each record uses this structure:
 
 Use `member: true` only for author names that should be underlined; keep punctuation and spaces in the appropriate citation segments. Use an empty string for `status` when there is no badge, or provide a status such as `"In press"`, `"Submitted"`, or `"Under review"`. For entries without a link, set `link` to `null` and `linkText` to an empty string. Use the existing category names so the category filter and totals continue to work.
 
+To credit figures from a paper, add a `figures` array to its record. Each figure needs a unique `id` within that publication, an image `src`, a short `credit` label, and the source `figure` number or range. For example:
+
+```json
+"figures": [
+  {
+    "id": "example-figure-1",
+    "src": "assets/images/example-figure.webp",
+    "credit": "Example study",
+    "figure": "Figure 1"
+  }
+]
+```
+
+The credits popup lists figure records once, even when an image is reused on multiple pages. Research Spotlights reference these records directly; do not duplicate the image path, source citation or DOI in spotlight data.
+
 If a homepage highlight links to an entry without a DOI, also set that bibliography record's `title` to its publication title. The highlight's `citationTitle`, year, and `citationCategory` are matched to this record; its `id` is used only to create the final page anchor. The `title` field is only required for records referenced by a homepage highlight.
 
 ### Research spotlights
 
 The homepage links to the separate [Research Spotlights page](./spotlight.html). Its entries are rendered from `data/research-spotlights.json`; add a new object to the `entries` array to publish another story. The array order is the display order. Copy an existing object and replace the text and assets—no HTML changes are needed.
 
-Each spotlight has a unique lowercase `id`, `date`, `title`, short `summary`, and a `paragraphs` array. The optional `author` field adds a byline only when present. Use `figures` to choose one or more existing images from `assets/images/` and provide their alt text, viewer title/caption, citation, and optional DOI. Figure `label` and `credit` are optional display text. Add an optional `datasets` array for files or external data links; each item has a `title` and `url`, with optional `format` and `description`. The optional `publication` object adds a DOI link for the story.
+Each spotlight has a unique lowercase `id`, `date`, `title`, short `summary`, and a `paragraphs` array. The optional `author` field adds a byline only when present. For a spotlight with figures, set `publicationId` to the matching record's `id` in `data/publications.json`. Each spotlight figure must reference a figure in that record using `publicationFigureId`; this shares the image path, source citation, DOI and popup credit. Put spotlight-specific alt text, viewer title/caption and a short `credit` caption on the spotlight figure; `label` is optional. Add an optional `datasets` array for files or external data links; each item has a `title` and `url`, with optional `format` and `description`.
 
 Example structure (all text is plain text; do not add HTML tags):
 
@@ -126,15 +144,14 @@ Example structure (all text is plain text; do not add HTML tags):
     "Describe the question and approach.",
     "Explain the result and why it matters."
   ],
+  "publicationId": "cv-example-paper-title-2027-journal-articles",
   "figures": [
     {
-      "image": "assets/images/example-figure.webp",
+      "publicationFigureId": "example-figure-1",
       "alt": "Describe the scientific content and any meaningful labels.",
       "title": "Short figure title",
       "caption": "Explain what the figure shows.",
-      "citation": "Full source citation for the figure.",
-      "doi": "10.0000/example",
-      "credit": "Figure 1 · Example et al. (2027)",
+      "credit": "A short figure description",
       "label": "OPTIONAL FIGURE LABEL"
     }
   ],
@@ -145,19 +162,15 @@ Example structure (all text is plain text; do not add HTML tags):
       "format": "CSV",
       "description": "Processed time-resolved measurements"
     }
-  ],
-  "publication": {
-    "label": "Read the paper",
-    "doi": "10.0000/example"
-  }
+  ]
 }
 ```
 
-Omit `author`, `datasets`, or `publication` when they are not needed. For figures without a DOI, omit `doi`; keep the full citation so it remains available in the enlarged figure viewer. Add any new image or data file under `assets/` or `data/` and use its path from the site root.
+Omit `author` or `datasets` when they are not needed. Add each new spotlight image to the corresponding publication's `figures` array first, then reference its figure ID. The figure viewer uses the publication citation and DOI from `data/publications.json`. Add any new image or data file under `assets/` or `data/` and use its path from the site root.
 
 ### Figures
 
-Replace the relevant file under `assets/images/`, or change its `src` in the HTML. A `figure-zoom` button supplies the enlarged viewer's title, caption and DOI through its `data-figure-*` attributes. Keep attribution and scientific labels/scale bars intact. Update `IMAGE-CREDITS.md` when changing images.
+Replace the relevant file under `assets/images/`, or change its `src` in `data/publications.json`. A `figure-zoom` button supplies the enlarged viewer's title, caption and DOI through its `data-figure-*` attributes. Keep attribution and scientific labels/scale bars intact. Update `IMAGE-CREDITS.md` when changing credited images.
 
 ## Included version and checks
 
