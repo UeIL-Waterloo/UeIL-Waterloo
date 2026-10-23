@@ -14,3 +14,5 @@ Figures are faithful excerpts from supplied publications, rendered or resized fo
 | solvated-electron.webp | Cheng et al., J. Phys. Chem. Lett. 10, 5742–5747 (2019), Fig. 3. https://doi.org/10.1021/acs.jpclett.9b01712 |
 | diffraction-dynamics.webp | Viernes et al. (2026), Fig. 2D: measured differential diffraction at ~200 fs and >3 ps. https://doi.org/10.34133/ultrafastscience.0200 |
 | diffraction-time-traces.webp | Viernes et al. (2026), Fig. 2E–F: peak intensity changes and SVD components. https://doi.org/10.34133/ultrafastscience.0200 |
+
+NOT UP TO DATE, TODO NEED TO BASE ON DATA-DRIVEN CREDIT
