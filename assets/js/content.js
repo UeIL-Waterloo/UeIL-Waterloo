@@ -21,9 +21,9 @@ window.siteContent = {
     },
     {
       "name": "Saadia Benourdja",
-      "role": "Research Associate · Part-time",
+      "role": "Research Associate",
       "group": "Researchers",
-      "focus": "Ultrafast Electron Imaging Laboratory",
+      "focus": "Nanofluidics and advanced electron microscopy",
       "photo": "",
       "pictured": true,
       "current": true,
@@ -84,12 +84,11 @@ window.siteContent = {
     },
     {
       "name": "Muna Abdulaziz",
-      "role": "Co-Supervised Visiting Researcher",
-      "group": "Visiting & co-supervised",
+      "role": "Visiting researcher",
       "focus": "Ontario Tech · Electrochemical-SERS studies at high temperature and pressure",
       "photo": "",
       "pictured": true,
-      "current": true,
+      "current": false,
     },
     {
       "name": "Watheq Al-Basheer",

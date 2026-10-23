@@ -2172,7 +2172,7 @@ nav [aria-current=page] {
 #research .section-top .eyebrow,
 #publications .section-top .eyebrow,
 #people .section-top .eyebrow,
-#pi .pi-bio>.eyebrow,
+#pi .pi-heading>.eyebrow,
 #contact .contact-grid>.eyebrow {
   font-size:var(--type-title-md);
   text-align:center
@@ -2181,13 +2181,21 @@ nav [aria-current=page] {
 #pi .pi-bio h2 {
   font-size:var(--type-title-lg)
 }
-#pi .pi-bio>h2,
-#pi .pi-bio>.pi-role {
+#pi .pi-heading {
+  display:flex;
+  flex-direction:column;
+  align-items:center;
+  width:100%;
   text-align:center
 }
-#pi .pi-bio>h2 {
-  margin-left:auto;
-  margin-right:auto
+#pi .pi-heading>h2 {
+  width:100%;
+  text-align:center
+}
+#pi .pi-heading>.pi-role {
+  width:fit-content;
+  max-width:100%;
+  text-align:center
 }
 #research .section-heading h2 {
   margin-left:auto;
