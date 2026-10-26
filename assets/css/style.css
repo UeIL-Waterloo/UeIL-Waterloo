@@ -271,6 +271,12 @@ nav>a:focus-visible {
   color:var(--muted);
   text-decoration:none
 }
+
+.education-links a {
+  color:var(--muted);
+  text-decoration:none
+}
+
 .publications-menu a:hover,
 .publications-menu a:focus-visible {
   color:var(--ink);
@@ -278,7 +284,7 @@ nav>a:focus-visible {
 }
 .education-links a:hover,
 .education-links a:focus-visible {
-  color:#6b894a;
+  color:var(--ink);
   background:#e9ede3
 }
 .publications-menu a {
@@ -321,11 +327,12 @@ nav>a:focus-visible {
   display:block
 }
 .education-links a {
-  display:block;
+  display: flex;
+  align-items: center;
   padding:9px 11px
 }
 .education-links a span {
-  float:right
+  float:right;
 }
 .education-links small {
   display:block;
@@ -378,7 +385,7 @@ nav>a:focus-visible {
     line-height:1.35
   }
   header .education-links {
-    min-width:290px;
+    min-width:185px;
     padding:10px
   }
   header .education-links small {
@@ -1230,12 +1237,12 @@ dialog li {
     position:static;
     width:100%;
     min-width:0;
-    margin:4px 0 0;
     padding:4px;
     text-align:center;
     box-shadow:none
   }
   .education-links a {
+    display: block;
     position:relative;
     padding:4px;
     line-height:1.25
@@ -1354,7 +1361,6 @@ dialog li {
     position:static;
     width:100%;
     min-width:0;
-    margin:4px 0 0;
     padding:4px;
     text-align:center;
     box-shadow:none
