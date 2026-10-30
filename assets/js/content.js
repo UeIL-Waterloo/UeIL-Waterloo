@@ -78,7 +78,7 @@ window.siteContent = {
       "role": "NanoFab Technician",
       "group": "Technical team",
       "focus": "Ultrafast Electron Imaging Laboratory",
-      "photo": "",
+      "photo": "assets/images/people/tetyana.jpg",
       "pictured": true,
       "current": true,
     },
