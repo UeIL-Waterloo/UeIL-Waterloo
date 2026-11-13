@@ -126,10 +126,45 @@ button:focus-visible,select:focus-visible,input:focus-visible{outline:2px solid 
 @media(max-width:820px){aside{display:block;visibility:hidden;transform:translateY(110%);transition:transform .2s ease,visibility .2s}body.controls-open aside{visibility:visible;transform:translateY(0)}}
 #rotationPanel{position:absolute;right:12px;top:134px;width:260px;max-width:calc(100% - 24px);padding:12px;border:1px solid #738da6;border-radius:12px;background:#102138;color:#eef6ff;z-index:6}#rotationPanel[hidden]{display:none}#rotationPanel label{color:#eef6ff}#rotationPanel .row{display:flex;gap:6px}#rotationPanel .note{margin:6px 0 0}#rotationPanel input{touch-action:none}
 @media(max-width:820px){#rotationPanel{top:12px;left:8px;right:auto;width:calc(100% - 140px);padding:8px}#rotationPanel .note{display:none}#rotationPanel label{font-size:14px}#rotationPanel select{min-height:40px;font-size:16px}}
+
+[hidden]{display:none!important}
+.section>label:not(.check),#attachmentFields>label{display:block;margin:11px 0 5px}
+#attachmentFields button,#enterRotation{margin-top:10px}
+details>summary{cursor:pointer;font-size:var(--control-font-size);font-weight:650;line-height:1.5}
+details[open]>summary{margin-bottom:10px}
+.section details{margin-top:12px}
+.primary{background:#24587b;border-color:#548db3;font-weight:650}.primary:hover{background:#30698e}
+.quiet{margin-top:9px;background:transparent;color:var(--muted)}
+button:disabled{opacity:.45;cursor:default}
+.range-ends{display:flex;justify-content:space-between;font-size:11px;color:var(--muted)}
+.info-grid{margin-top:14px}.hybrid-grid{margin-top:6px}
+#emptyWorkspace{position:absolute;left:50%;top:46%;transform:translate(-50%,-50%);width:330px;max-width:calc(100% - 32px);padding:24px;border:1px solid #34516a;border-radius:18px;background:rgba(12,28,45,.95);box-shadow:0 20px 60px #0002;z-index:7}
+#emptyWorkspace h2{font-size:22px;margin:8px 0}#emptyWorkspace p{font-size:14px;line-height:1.5;color:#b2c6d8}#emptyWorkspace label{display:block;margin-bottom:6px}#emptyWorkspace button{margin-top:12px}#emptyWorkspace .note{font-size:12px}.empty-symbol{font-size:32px;color:#94bedb}
+#stage.light #emptyWorkspace{background:#f7fbff;color:#17283a;border-color:#9aafc1}#stage.light #emptyWorkspace p,#stage.light #emptyWorkspace label{color:#40556a}#stage.light #emptyWorkspace select{color:#17283a;border-color:#9aafc1}
+#rotationPanel{width:270px}#rotationPanel label{display:block;margin:6px 0}
+@media(max-width:820px){#emptyWorkspace{padding:18px;top:43%}#emptyWorkspace h2{font-size:20px}#rotationPanel{width:calc(100% - 140px)}#rotationPanel select{min-height:36px;font-size:14px}#rotationPanel label{font-size:12px}#rotationPanel .row{margin-top:4px}}
+
+/* The controls and visualization have independent background settings. */
+body.controls-light{--bg:#eaf0f5;--panel:#edf3f7;--panel2:#fff;--text:#193247;--muted:#4d6579;--border:#c7d3de;--accent:#246f9e;--button:#f5f8fb;--button-hover:#e3eef6}
+body.controls-light aside{background:#edf3f7}
+body.controls-light .mobile-toolbar,body.controls-light .mobile-panel-head{background:#f8fbfd;color:#193247}
+body.controls-light .pi-status{color:#294459;background:#f0f5f8;border-color:#bfcfdb}
+body.controls-light .hybrid-grid button.active{background:#d8ebf8;border-color:#377ca6}
+body.controls-light #workspaceMessage{color:#1b5f88}
+body.controls-light #mobileRemove[aria-pressed="true"]{background:#fff0cc;border-color:#a97412;color:#6f4700}
+body.controls-light #rotationPanel{background:#f8fbfd;border-color:#9aafc1;color:#193247}
+body.controls-light #rotationPanel label{color:#193247}
+.primary{color:#fff!important}
+.viewport-card,#emptyWorkspace{color:#eef6ff}
+#emptyWorkspace label{color:#b6c7da}
+#emptyWorkspace select{color:#eef6ff;background:#182b3f;border-color:#516c83}
+#stage.light #emptyWorkspace select{background:#fff;color:#17283a}
+@media(max-width:820px){.desktop-word{display:none}.mobile-toolbar{gap:4px;padding-left:4px;padding-right:4px}.mobile-toolbar button{font-size:14px;padding-left:4px;padding-right:4px}#newProject{order:0}}
 </style>
 </head>
-<body>
+<body class="controls-light">
 <div class="mobile-toolbar" aria-label="Visualization controls">
+  <button id="newProject" title="Start a new project" aria-label="New project">New<span class="desktop-word"> project</span></button>
   <button id="mobileControls" aria-controls="controlsPanel" aria-expanded="false">Controls</button>
   <select id="interactionMode" aria-label="Interaction mode"><option value="build">Build</option><option value="electrons">Electrons</option><option value="rotate">Rotate</option><option value="inspect">Inspect bonds</option></select><button id="undoAction" class="history-tool" title="Undo (Ctrl/⌘ Z)">Undo</button><button id="redoAction" class="history-tool" title="Redo (Ctrl/⌘ Shift Z)">Redo</button>
   <button id="mobileInfo" aria-controls="overlapDescription" aria-pressed="false" title="Show overlap description">Info</button>
@@ -141,159 +176,91 @@ button:focus-visible,select:focus-visible,input:focus-visible{outline:2px solid 
 <aside id="controlsPanel" aria-label="Orbital controls">
   <div class="mobile-panel-head"><strong>Orbital controls</strong><button id="mobileDone">Done</button></div>
   <h1>Hybrid Orbital Visualizer</h1>
-  <p class="subtitle">Interactive hybrid orbitals, remaining unhybridized p orbitals, and multi-centre orbital overlap.</p>
-
-  <div class="section">
-    <div class="section-title">Workspace & lessons</div>
-    <div class="row"><button id="saveStructure">Save structure</button><button id="loadStructure">Load structure</button></div>
-    <input id="structureFile" type="file" accept=".json,application/json" hidden>
-    <div class="row" style="margin-top:8px"><button id="downloadSVG">Download SVG</button><button id="downloadPDF">Download PDF</button></div>
-    <p class="note">Export the visual with labels, axes and colours. SVG and PDF are vector formats. Controls are omitted.</p>
-    <label for="lessonPreset">Teaching example</label>
-    <select id="lessonPreset"><option value="ethene">Ethene · one π bond</option><option value="ethyne">Ethyne · two π bonds</option><option value="allene">Allene · perpendicular π bonds</option><option value="ring">Planar six-centre ring</option></select>
-    <div class="row"><button id="loadLesson">Load example</button><button id="resetLesson">Reset example</button></div>
-    <p class="note" id="lessonGuide">Build: select a free hybrid to preview the next centre, then attach it. Switch to Electrons to form bonds or Inspect bonds for an explanation.</p>
-    <div id="workspaceMessage" role="status" aria-live="polite"></div>
-    <details><summary>About this model</summary><p class="note">Orbital shapes and overlap surfaces are schematic, not calculated electron densities. Each p orbital is assigned to at most one localized π bond. Conjugated rings have delocalized π electrons; this display illustrates localized contributors rather than the full electronic structure. The sp³d and sp³d² shapes are geometric teaching models, not a quantitative description of hypervalent bonding.</p></details>
-  </div>
-  <div class="section">
-    <div class="section-title">Active centre hybridization</div>
-    <div class="hybrid-grid" id="hybridButtons">
-      <button data-kind="sp">sp</button>
-      <button data-kind="sp2">sp²</button>
-      <button data-kind="sp3">sp³</button>
-      <button data-kind="sp3d">sp³d</button>
-      <button data-kind="sp3d2">sp³d²</button>
+  <p class="subtitle">Build a structure. Explore overlap and bond-axis rotation.</p>
+  <section class="section" id="buildTools">
+    <div class="section-title">Build</div>
+    <label for="newCentreKind">New centre</label>
+    <select id="newCentreKind"><option value="sp">sp · linear</option><option value="sp2" selected>sp² · trigonal planar</option><option value="sp3">sp³ · tetrahedral</option><option value="sp3d">sp³d · trigonal bipyramidal</option><option value="sp3d2">sp³d² · octahedral</option></select>
+    <div id="attachmentFields">
+      <label for="attachCentre">Attach to centre</label><select id="attachCentre"></select>
+      <label for="attachHybrid">Available hybrid</label><select id="attachHybrid"></select>
+      <button id="pickAttachment" aria-pressed="false">Pick a hybrid in the scene</button>
     </div>
-  </div>
-
-  <div class="section">
-    <div class="section-title">Centres & overlap</div>
-    <label for="attachCentre">Attach to centre</label><select id="attachCentre"></select>
-    <label for="attachHybrid" style="display:block;margin-top:8px">Available hybrid on that centre</label><select id="attachHybrid"></select>
-    <label for="newCentreKind" style="display:block;margin-top:8px">New centre hybridization</label>
-    <select id="newCentreKind"><option value="sp">sp</option><option value="sp2">sp²</option><option value="sp3" selected>sp³</option><option value="sp3d">sp³d</option><option value="sp3d2">sp³d²</option></select>
-    <button id="pickAttachment" style="margin-top:8px" aria-pressed="false">Pick attachment hybrid in scene</button>
     <p class="note" id="attachmentStatus" aria-live="polite"></p>
-    <div class="controls-row">
-      <button id="addCenter">+ Attach centre</button>
-      <button id="removeCenter">− Remove last</button>
-    </div>
-
-    <div class="row"><label for="spacing">Centre spacing</label><div class="value" id="spacingVal">2.55</div></div>
-    <input id="spacing" type="range" min="1.20" max="4.20" step="0.05" value="2.55">
-
-    <label class="check"><input id="autoFace" type="checkbox" checked> Auto-face reference σ hybrids</label>
-    <label class="check"><input id="sigmaLock" type="checkbox" checked> σ-bond constraint: rotation only about bond axis</label>
-    <label class="check"><input id="showPiBond" type="checkbox" checked> Show π-overlap density for visible p orbitals</label>
-
-    <label for="overlapPair" style="display:block;margin-top:8px;">Overlap pair</label>
-    <select id="overlapPair"></select>
-
-    <div class="controls-row">
-      <button id="piPreset">Align π overlap</button>
-      <button id="resetTransforms">Reset transforms</button>
-    </div>
-
-    <div class="pi-status" id="piControlsInfo" aria-live="polite"></div>
+    <div class="controls-row"><button id="addCenter" class="primary">+ Add first centre</button><button id="removeCenter">Remove last</button></div>
+    <button id="clearWorkspace" class="quiet">New project</button>
+  </section>
+  <section class="section" id="activeTools" hidden>
+    <div class="section-title">Selected centre</div>
+    <label for="activeCentreSelect">Centre</label><select id="activeCentreSelect"></select>
+    <label class="small-label">Hybridization</label>
+    <div class="hybrid-grid" id="hybridButtons"><button data-kind="sp">sp</button><button data-kind="sp2">sp²</button><button data-kind="sp3">sp³</button><button data-kind="sp3d">sp³d</button><button data-kind="sp3d2">sp³d²</button></div>
+    <button id="enterRotation">Rotate about a σ axis</button>
+    <p class="note">The σ axis stays fixed. Attached centres on the rotating side move together.</p>
     <div id="centersList"></div>
-    <p class="note">Localized valence-bond model: each p orbital can belong to one π bond. An sp² centre has one available p orbital; an sp centre has two perpendicular p orbitals. Selected p gives assignment priority when equivalent choices exist. The selected p phase sets its relative sign in the orbital combination; matching signs give bonding overlap. Inverting one sign gives an out-of-phase combination. Delocalized conjugation is not represented by this localized assignment.</p>
-    <p class="note">The σ-bond constraint keeps the reference hybrids on the internuclear axis and permits torsion about that axis. Switch it off for free rotation. Actual σ connections are detected from overlapping hybrid lobes, including hybrids other than the reference selection.</p>
-  </div>
-
-  <div class="section">
-    <div class="section-title">Orbital display</div>
-    <label for="renderMode">Hybrid orbitals</label>
-    <select id="renderMode">
-      <option value="all">Show all hybrids on every centre</option>
-      <option value="none">Hide all hybrids</option>
-      <option value="centre">Show hybrids in the selected centre</option>
-    </select>
-
-    <label class="check"><input id="showTerminalS" type="checkbox"> Show terminal 1s orbitals (σ bonds)</label>
-    <div class="row"><label for="sOpacity">Terminal 1s opacity</label><div class="value" id="sOpacityVal">0.45</div></div>
-    <input id="sOpacity" type="range" min="0.10" max="1" step="0.01" value="0.45" disabled>
-    <p class="note">Terminal 1s spheres attach to available hybrid lobes. They appear when hybrid–hybrid overlap is lost and disappear when a σ connection forms. They follow the hybrid display selection and move with their centre. These are schematic orbital surfaces; the overlap indicator is geometric, not a calculated overlap integral or bond energy.</p>
-
-    <label for="pMode" style="display:block;margin-top:8px;">Unhybridized p display</label>
-    <select id="pMode">
-      <option value="all">Show all p-orbitals</option>
-      <option value="none">Hide all p-orbitals</option>
-      <option value="phase">Show phase colours</option>
-    </select>
-
-    <label for="colorMode" style="display:block;margin-top:9px;">Hybrid colours</label>
-    <select id="colorMode">
-      <option value="orbital">Color by hybrid orbital</option>
-      <option value="phase">Phase colors</option>
-      <option value="mono">Monochrome</option>
-    </select>
-
-    <label class="check"><input id="bondSound" type="checkbox"> Sound on bond formation</label>
-    <label for="bondVolume">Bond sound volume <span id="bondVolumeVal">20%</span></label>
-    <input id="bondVolume" type="range" min="0" max="100" step="1" value="20" aria-label="Bond sound volume">
-    <div class="note">In-phase π overlap is shown before electrons are added. A formed bond requires one electron in each overlapping orbital. Formed σ bonds are green; formed π bonds are light orange, overriding phase colours.</div>
-    <div role="group" aria-label="Electron action">
-    <label class="check"><input id="editElectrons" type="radio" name="electronAction" value="add"> Add electrons by clicking or tapping</label>
-    <label class="check"><input id="removeElectronMode" type="radio" name="electronAction" value="remove"> Remove electrons by clicking or tapping</label>
-    </div>
-    <button id="clearElectrons">Clear all electron dots</button>
-    <p class="note">Click or tap a lobe to add an electron; Shift-click or enable removal mode to remove one (maximum two per orbital). Both p lobes share one orbital. Two dots mark a lone pair, which is excluded from bonding. Changing hybridization clears that centre’s electron dots.</p>
-    <div class="pi-status" id="electronStatus" aria-live="polite">Click an orbital lobe to add an electron.</div>
-    <label class="check"><input id="showBack" type="checkbox" checked> Show small opposite hybrid lobes</label>
-    <label class="check"><input id="showAxes" type="checkbox" checked> Show x, y, z orientation guide</label>
-    <label class="check"><input id="showGuides" type="checkbox" checked> Show ideal geometry guides</label>
-    <label class="check"><input id="showOverlapDescription" type="checkbox" aria-controls="overlapDescription" checked> Show overlap description</label>
-    <label class="check"><input id="showLabels" type="checkbox" checked> Show orbital labels</label>
-    <label class="check"><input id="spin" type="checkbox"> Auto-rotate scene</label>
-  </div>
-
-  <div class="section">
-    <div class="section-title">Appearance</div>
-    <div class="row"><label for="opacity">Hybrid opacity</label><div class="value" id="opacityVal">0.82</div></div>
-    <input id="opacity" type="range" min="0.12" max="1" step="0.01" value="0.82">
-
-    <div class="row"><label for="pOpacity">p-orbital opacity</label><div class="value" id="pOpacityVal">0.68</div></div>
-    <input id="pOpacity" type="range" min="0.10" max="1" step="0.01" value="0.68">
-
-    <div class="row"><label for="size">Hybrid lobe size</label><div class="value" id="sizeVal">1.00×</div></div>
-    <input id="size" type="range" min="0.65" max="1.35" step="0.01" value="1">
-
-    <div class="row"><label for="pSize">p-orbital size</label><div class="value" id="pSizeVal">0.86×</div></div>
-    <input id="pSize" type="range" min="0.45" max="1.25" step="0.01" value="0.86">
-
-    <div class="row"><label for="backSize">Back-lobe size</label><div class="value" id="backSizeVal">0.34×</div></div>
-    <input id="backSize" type="range" min="0.15" max="0.60" step="0.01" value="0.34">
-
-    <div class="row"><label for="zoom">Zoom</label><div class="value" id="zoomVal">1.00×</div></div>
-    <input id="zoom" type="range" min="0.55" max="1.85" step="0.01" value="1">
-
-    <div class="controls-row">
-      <button id="resetView">Reset view</button>
-      <button id="bgToggle">Light background</button>
-    </div>
-  </div>
-
-  <div class="section">
-    <div class="section-title">Active centre information</div>
-    <div class="info-grid">
-      <div class="k">Geometry</div><div class="v" id="geometryInfo">—</div>
-      <div class="k">Hybrid orbitals</div><div class="v" id="countInfo">—</div>
-      <div class="k">Ideal angles</div><div class="v" id="angleInfo">—</div>
-      <div class="k">s character</div><div class="v" id="sInfo">—</div>
-      <div class="k">Orbitals mixed</div><div class="v" id="mixInfo">—</div>
-      <div class="k">Remaining p</div><div class="v" id="pInfo">—</div>
-    </div>
+  </section>
+  <section class="section">
+    <div class="section-title">Display</div>
+    <label for="controlsTheme">Controls background</label><select id="controlsTheme"><option value="light">Light</option><option value="dark">Dark</option></select>
+    <div class="row"><label for="transparency">Orbital transparency</label><span class="value" id="transparencyVal">35%</span></div>
+    <input id="transparency" type="range" min="0" max="100" step="1" value="35">
+    <div class="range-ends"><span>Solid</span><span>Transparent</span></div>
+    <label for="colorMode">Orbital colours</label><select id="colorMode"><option value="mono">Single colour</option><option value="phase">Phase signs · blue / red</option></select>
+    <label for="renderMode">Hybrid orbitals</label><select id="renderMode"><option value="all">Show all hybrids on every centre</option><option value="none">Hide all hybrids</option><option value="centre">Show hybrids in the selected centre</option></select>
+    <label for="pMode">Unhybridized p orbitals</label><select id="pMode"><option value="all">Show all p-orbitals</option><option value="none">Hide all p-orbitals</option><option value="phase">Show phase colours</option></select>
+    <label class="check"><input id="showTerminalS" type="checkbox"> Show terminal 1s orbitals</label>
+    <label class="check"><input id="showLabels" type="checkbox"> Show orbital labels</label>
+    <div class="controls-row"><button id="resetView">Reset view</button><button id="bgToggle">Light background</button></div>
+    <details><summary>More display options</summary>
+      <label class="check"><input id="showBack" type="checkbox" checked> Show opposite hybrid lobes</label>
+      <label class="check"><input id="showAxes" type="checkbox" checked> Show orientation axes</label>
+      <label class="check"><input id="showGuides" type="checkbox"> Show geometry guides</label>
+      <label class="check"><input id="showPiBond" type="checkbox" checked> Show in-phase π overlap</label>
+      <label class="check"><input id="showOverlapDescription" type="checkbox"> Show overlap description</label>
+      <label class="check"><input id="spin" type="checkbox"> Auto-rotate scene</label>
+    </details>
+  </section>
+  <section class="section" id="electronTools" hidden>
+    <div class="section-title">Electrons</div>
+    <div role="group" aria-label="Electron action"><label class="check"><input id="editElectrons" type="radio" name="electronAction" value="add"> Add an electron</label><label class="check"><input id="removeElectronMode" type="radio" name="electronAction" value="remove"> Remove an electron</label></div>
+    <p class="note">Click an orbital to add an electron. Shift-click to remove it. Two electrons in one orbital form a lone pair.</p>
+    <div class="pi-status" id="electronStatus" aria-live="polite">Select an orbital.</div>
+    <button id="clearElectrons">Clear electron dots</button>
+    <details><summary>Bond sound</summary><label class="check"><input id="bondSound" type="checkbox"> Sound on bond formation</label><label for="bondVolume">Volume <span id="bondVolumeVal">20%</span></label><input id="bondVolume" type="range" min="0" max="100" value="20"></details>
+  </section>
+  <details class="section"><summary>Overlap & centre information</summary>
+    <label for="overlapPair">Overlap pair</label><select id="overlapPair"></select>
+    <div class="controls-row"><button id="piPreset">Align π overlap</button><button id="resetTransforms">Reset torsions</button></div>
+    <div class="pi-status" id="piControlsInfo" aria-live="polite"></div>
+    <div class="info-grid"><span class="k">Geometry</span><span class="v" id="geometryInfo">—</span><span class="k">Hybrids</span><span class="v" id="countInfo">—</span><span class="k">Ideal angles</span><span class="v" id="angleInfo">—</span><span class="k">s character</span><span class="v" id="sInfo">—</span><span class="k">Orbitals mixed</span><span class="v" id="mixInfo">—</span><span class="k">Remaining p</span><span class="v" id="pInfo">—</span></div>
     <p class="note" id="chemNote"></p>
+  </details>
+  <details class="section" id="workspaceTools"><summary>Examples, files & exports</summary>
+    <label for="lessonPreset">Teaching example</label><select id="lessonPreset"><option value="ethene">Ethene · one π bond</option><option value="ethyne">Ethyne · two π bonds</option><option value="allene">Allene · perpendicular π bonds</option><option value="ring">Planar six-centre ring</option></select>
+    <div class="controls-row"><button id="loadLesson">Load example</button><button id="resetLesson">Reset example</button></div>
+    <p class="note" id="lessonGuide">Choose a hybridization and add your first centre.</p>
+    <div class="controls-row"><button id="saveStructure">Save structure</button><button id="loadStructure">Load structure</button></div>
+    <input id="structureFile" type="file" accept=".json,application/json" hidden>
+    <div class="controls-row"><button id="downloadSVG">Download SVG</button><button id="downloadPDF">Download PDF</button></div>
+    <p class="note">Both formats are vector, with labels, axes and colours. Controls are omitted.</p>
+  </details>
+  <div id="workspaceMessage" role="status" aria-live="polite"></div>
+  <details class="section"><summary>About this model</summary><p class="note">The smooth surfaces illustrate orbital shape and phase; they are schematic, not calculated electron densities. Matching phases can give π overlap before electrons are added. One electron in each overlapping orbital forms a bond: σ green, π light orange. Each p orbital belongs to at most one localized π bond; conjugation is not represented. The sp³d and sp³d² sets are geometric teaching models. Bond-axis rotation illustrates torsion without moving the reference σ axis; a ring cannot twist independently without changing its geometry.</p></details>
+  <div hidden aria-hidden="true" id="legacyGeometryControls">
+    <input id="autoFace" type="checkbox" checked><input id="sigmaLock" type="checkbox" checked>
+    <input id="spacing" value="2.55"><span id="spacingVal"></span>
+    <input id="opacity" value="0.65"><span id="opacityVal"></span><input id="pOpacity" value="0.65"><span id="pOpacityVal"></span><input id="sOpacity" value="0.65"><span id="sOpacityVal"></span>
+    <input id="size" value="1"><span id="sizeVal"></span><input id="pSize" value="0.86"><span id="pSizeVal"></span><input id="backSize" value="0.34"><span id="backSizeVal"></span><input id="zoom" value="1"><span id="zoomVal"></span>
   </div>
 </aside>
 
 <main id="stage">
   <canvas id="canvas"></canvas>
+  <div id="emptyWorkspace"><div class="empty-symbol" aria-hidden="true">＋</div><h2>Start a structure</h2><p>Choose the hybridization of your first centre.</p><label for="firstCentreKind">Hybridization</label><select id="firstCentreKind"><option value="sp">sp · linear</option><option value="sp2" selected>sp² · trigonal planar</option><option value="sp3">sp³ · tetrahedral</option><option value="sp3d">sp³d · trigonal bipyramidal</option><option value="sp3d2">sp³d² · octahedral</option></select><button id="addFirstCenter" class="primary">+ Add first centre</button><p class="note">Then select a free hybrid to attach the next centre.</p></div>
   <div id="rotationPanel" hidden>
     <label for="rotateCentre">Rotate centre about σ axis</label>
     <select id="rotateCentre" aria-label="Centre to rotate"></select>
-    <label for="quickTorsion" id="rotationAxisLabel">Torsion</label>
+    <label for="rotationBond">σ axis</label><select id="rotationBond"></select><label for="quickTorsion" id="rotationAxisLabel">Torsion</label>
     <input id="quickTorsion" type="range" min="-180" max="180" step="1" value="0">
     <div class="row"><button id="torsionZero">0°</button><button id="torsionQuarter">90°</button></div>
     <p class="note" id="torsionHelp">Drag a centre or its orbital to twist it. Drag empty space to rotate the scene.</p>
@@ -320,8 +287,8 @@ let exporting=false,exportScale=1;
 const stage = document.getElementById('stage');
 const $ = id => document.getElementById(id);
 
-const colors = ['#4cc9f0','#f72585','#ffd166','#80ed99','#b388ff','#ff9f1c'];
-const centerColors = ['#64d8ff','#ff7eb6','#ffe27a','#86efac'];
+const colors = ['#8cb9d9'];
+const centerColors = ['#a2b9c9'];
 
 function norm(v){const m=Math.hypot(v[0],v[1],v[2])||1;return[v[0]/m,v[1]/m,v[2]/m]}
 function add(a,b){return[a[0]+b[0],a[1]+b[1],a[2]+b[2]]}
@@ -365,13 +332,9 @@ const orbitalData = {
 };
 
 const state = {
-  centers:[
-    {kind:'sp2', selected:0, selectedP:0, base:[-.5,0,0], frame:[[1,0,0],[0,1,0],[0,0,1]], reference:1,bondHybrid:0,pos:[0,0,0],rot:[0,0,0],torsion:0},
-    {kind:'sp2', selected:0, selectedP:0, base:[.5,0,0],frame:[[-1,0,0],[0,-1,0],[0,0,1]],reference:0,bondHybrid:0,pos:[0,0,0],rot:[0,0,0],torsion:0}
-  ],
-  mode:"build",lesson:"ethene",
-  activeCenter:0,
-  attachCentre:0,attachHybrid:1,attachmentHighlight:false,newCentreKind:'sp3',pickAttachment:false,
+  centers:[],
+  mode:'build',lesson:'',activeCenter:0,
+  attachCentre:0,attachHybrid:-1,attachmentHighlight:false,newCentreKind:'sp2',pickAttachment:false,
   overlapPair:0,
   spacing:2.55,
   autoFace:true,
@@ -379,28 +342,28 @@ const state = {
   showPiBond:true,
   renderMode:'all',
   showTerminalS:false,
-  sOpacity:.45,
+  sOpacity:.65,
   pMode:'all',
-  colorMode:'orbital',
+  colorMode:'mono',
   showBack:true,
   showAxes:true,
-  showGuides:true,
-  showLabels:true,
-  showOverlapDescription:true,
+  showGuides:false,
+  showLabels:false,
+  showOverlapDescription:false,
   spin:false,
   editElectrons:false,
   removeElectronMode:false,
-  opacity:.82,
-  pOpacity:.68,
+  opacity:.65,
+  pOpacity:.65,
   lobeScale:1,
   pScale:.86,
   backScale:.34,
   zoom:1,
   yaw:-.55,
   pitch:.42,
-  light:false,
+  light:false,controlsTheme:'light',
   dragging:false,lastX:0,lastY:0,lastT:performance.now(),
-  dpr:Math.min(2,window.devicePixelRatio||1)
+  dpr:Math.min(3,Math.max(1.5,window.devicePixelRatio||1))
 };
 
 function identityMatrix(){return [[1,0,0],[0,1,0],[0,0,1]]}
@@ -473,7 +436,7 @@ function isPairCenter(i){
   const [a,b]=pairIndices();return i===a||i===b;
 }
 function bondNeighbor(i){
-  const j=state.centers[i].reference;return Number.isInteger(j)&&j>=0&&j<state.centers.length&&j!==i?j:-1;
+  const j=state.centers[i]?.reference;return Number.isInteger(j)&&j>=0&&j<state.centers.length&&j!==i?j:-1;
 }
 function centerBondAxis(i){
   if(state.centers.length<2)return [1,0,0];
@@ -487,22 +450,15 @@ function pairBondAxis(){
 }
 function autoFaceMatrix(i){
   const c=state.centers[i],frame=c.frame||identityMatrix(),other=bondNeighbor(i);
-  if(!(state.autoFace||state.sigmaLock)||other<0)return frame;
+  if(other<0)return frame;
   const v=orbitalData[c.kind].vectors[c.bondHybrid??c.selected]||orbitalData[c.kind].vectors[0];
   const from=applyM(frame,v),delta=sub(centerPosition(other),centerPosition(i));
   if(Math.hypot(...delta)<1e-8)return frame;
   return matMul(alignMatrix(from,norm(delta)),frame);
 }
 function centerOrientation(i){
-  const faced=autoFaceMatrix(i);
-  if(state.sigmaLock && bondNeighbor(i)>=0){
-    // A σ bond fixes the selected hybrid along the internuclear axis; only torsion remains.
-    const twist=axisAngleMatrix(centerBondAxis(i),state.centers[i].torsion||0);
-    return matMul(twist,faced);
-  }
-  const manual=eulerMatrix(state.centers[i].rot||[0,0,0]);
-  const twist=bondNeighbor(i)>=0?axisAngleMatrix(centerBondAxis(i),state.centers[i].torsion||0):identityMatrix();
-  return matMul(manual,matMul(twist,faced));
+  const c=state.centers[i],faced=autoFaceMatrix(i);
+  return bondNeighbor(i)>=0?matMul(axisAngleMatrix(centerBondAxis(i),c.torsion||0),faced):faced;
 }
 function localToWorld(i,v){
   return add(centerPosition(i),applyM(centerOrientation(i),v));
@@ -514,25 +470,25 @@ function rotate(v){
   return [x,cp*y-sp*z,sp*y+cp*z];
 }
 
-let lastRenderKey="";
+let lastRenderKey="",viewFraming=null;
+function reframeScene(){viewFraming=null;labelOffsets.clear();lastRenderKey='';}
 function resize(){
   lastRenderKey="";
   const r=stage.getBoundingClientRect();
-  state.dpr=Math.min(2,window.devicePixelRatio||1);
-  canvas.width=Math.max(1,Math.floor(r.width*state.dpr));
-  canvas.height=Math.max(1,Math.floor(r.height*state.dpr));
+  state.dpr=Math.min(3,Math.max(1.5,window.devicePixelRatio||1));
+  const width=Math.max(1,Math.floor(r.width*state.dpr)),height=Math.max(1,Math.floor(r.height*state.dpr));
+  if(canvas.width!==width)canvas.width=width;if(canvas.height!==height)canvas.height=height;
   canvas.style.width=r.width+'px';canvas.style.height=r.height+'px';
 }
 function metrics(){
   const w=canvas.width/state.dpr,h=canvas.height/state.dpr;
-  const pts=state.centers.map((_,i)=>centerPosition(i));
-  const xs=pts.map(p=>p[0]),ys=pts.map(p=>p[1]),zs=pts.map(p=>p[2]);
-  const rangeX=(Math.max(...xs)-Math.min(...xs))+4.0;
-  const rangeYZ=Math.max(Math.max(...ys)-Math.min(...ys),Math.max(...zs)-Math.min(...zs))+4.0;
-  const fitW=(w*.86)/Math.max(4,rangeX);
-  const fitH=(h*.72)/Math.max(4,rangeYZ);
-  const origin=[(Math.max(...xs)+Math.min(...xs))/2,(Math.max(...ys)+Math.min(...ys))/2,(Math.max(...zs)+Math.min(...zs))/2];
-  return {w,h,cx:w*.5,cy:h*.53,origin,baseScale:Math.min(fitW,fitH)};
+  // Fit after a structural edit or explicit reset, never while a branch twists.
+  if(!viewFraming||viewFraming.count!==state.centers.length||viewFraming.spacing!==state.spacing){
+    const pts=state.centers.length?state.centers.map((_,i)=>centerPosition(i)):[[0,0,0]],xs=pts.map(p=>p[0]),ys=pts.map(p=>p[1]),zs=pts.map(p=>p[2]);
+    viewFraming={count:state.centers.length,spacing:state.spacing,rangeX:Math.max(...xs)-Math.min(...xs)+4,rangeYZ:Math.max(Math.max(...ys)-Math.min(...ys),Math.max(...zs)-Math.min(...zs))+4,origin:[(Math.max(...xs)+Math.min(...xs))/2,(Math.max(...ys)+Math.min(...ys))/2,(Math.max(...zs)+Math.min(...zs))/2]};
+  }
+  const {origin,rangeX,rangeYZ}=viewFraming;
+  return {w,h,cx:w*.5,cy:h*.53,origin,baseScale:Math.min(w*.86/Math.max(4,rangeX),h*.72/Math.max(4,rangeYZ))};
 }
 function project(v,m){
   const r=rotate(sub(v,m.origin)),pers=1/(1+r[2]*.035),s=m.baseScale*state.zoom*pers;
@@ -550,41 +506,41 @@ function mixColor(hex,f){
 }
 function hybridColor(orbitalIndex,isBack,centreIndex){
   if(state.attachmentHighlight&&centreIndex===state.attachCentre&&orbitalIndex===state.attachHybrid)return '#ffff00';
-  if(state.colorMode==='mono')return isBack?'#929eaa':'#dce5ee';
-  if(state.colorMode==='phase')return isBack?'#ef5350':'#42a5f5';
+  if(state.colorMode!=='phase')return '#8cb9d9';
+  if(state.colorMode==='phase')return isBack?'#ef7777':'#71b9eb';
   const c=colors[orbitalIndex%colors.length];
   return isBack?mixColor(c,-.32):c;
 }
 function pColor(phase,axisIndex){
-  if(state.pMode==='phase')return phase<0?'#ef5350':'#42a5f5';
-  return axisIndex%2===0?'#8b5cf6':'#22d3ee';
+  if(state.colorMode==='phase'||state.pMode==='phase')return phase<0?'#ef7777':'#71b9eb';
+  return '#8cb9d9';
 }
 
 function makeBasis(axis){
   const a=norm(axis),ref=Math.abs(a[2])<.88?[0,0,1]:[0,1,0];
   const u=norm(cross(ref,a)),v=norm(cross(a,u));return{a,u,v};
 }
+// A rounded, tapered surface with an analytic normal at every vertex.
+// This remains a schematic orbital envelope, not an electron-density isosurface.
+function lobeRadius(q,width){return 2*width*Math.sqrt(Math.max(0,q*(1-q)))*(.72+.28*q);}
 function lobeMeshWorld(centerIdx,axis,length,width,tag){
-  const {a,u,v}=makeBasis(norm(axis)),segT=16,segA=20,verts=[];
+  const {a,u,v}=makeBasis(norm(axis)),segT=32,segA=48,verts=[],normals=[];
   const orientation=centerOrientation(centerIdx),position=centerPosition(centerIdx);
   for(let ti=0;ti<=segT;ti++){
-    const q=ti/segT,base=Math.pow(Math.sin(Math.PI*q),.72),bias=.48+.86*q;
-    const radius=width*base*bias,axial=.03+length*q;
+    const t=ti/segT*Math.PI,q=(1-Math.cos(t))/2,st=Math.sin(t),ct=Math.cos(t),radius=lobeRadius(q,width),axial=.03+length*q;
+    const dr=width*(ct*(.72+.28*q)+.14*st*st),dx=length*.5*st;
     for(let ai=0;ai<segA;ai++){
-      const ang=ai/segA*Math.PI*2;
-      const loc=add(mul(a,axial),add(mul(u,Math.cos(ang)*radius),mul(v,Math.sin(ang)*radius)));
-      verts.push(add(position,applyM(orientation,loc)));
+      const ang=ai/segA*Math.PI*2,radial=add(mul(u,Math.cos(ang)),mul(v,Math.sin(ang)));
+      verts.push(add(position,applyM(orientation,add(mul(a,axial),mul(radial,radius)))));
+      normals.push(norm(applyM(orientation,add(mul(a,-dr),mul(radial,dx)))));
     }
   }
-  const tris=[];
+  const tris=[],push=(a,b,c)=>tris.push([verts[a],verts[b],verts[c],tag,[normals[a],normals[b],normals[c]]]);
   for(let ti=0;ti<segT;ti++)for(let ai=0;ai<segA;ai++){
     const aj=(ai+1)%segA,i0=ti*segA+ai,i1=ti*segA+aj,i2=(ti+1)*segA+aj,i3=(ti+1)*segA+ai;
-    tris.push([verts[i0],verts[i1],verts[i2],tag]);
-    tris.push([verts[i0],verts[i2],verts[i3],tag]);
-  }
-  return tris;
+    if(ti>0)push(i0,i1,i2);if(ti<segT-1)push(i0,i2,i3);
+  }return tris;
 }
-
 function drawLine3D(a,b,m,color,width=1,dash=[]){
   const pa=project(a,m),pb=project(b,m);ctx.save();ctx.strokeStyle=color;ctx.lineWidth=width;ctx.setLineDash(dash);
   ctx.beginPath();ctx.moveTo(pa.x,pa.y);ctx.lineTo(pb.x,pb.y);ctx.stroke();ctx.restore();
@@ -596,7 +552,7 @@ function axesOrigin(m){
 function drawAxes(m){
   const {cx,cy}=axesOrigin(m),r=30;
   ctx.save();ctx.fillStyle=state.light?'rgba(255,255,255,.94)':'rgba(7,17,31,.94)';ctx.strokeStyle=state.light?'#8496a8':'#526980';ctx.lineWidth=1;ctx.beginPath();ctx.roundRect(cx-53,cy-53,106,106,12);ctx.fill();ctx.stroke();
-  const axes=[{v:[1,0,0],c:state.light?'#b32636':'#ff7b85',l:'x'},{v:[0,1,0],c:state.light?'#167340':'#6ae6a0',l:'y'},{v:[0,0,1],c:state.light?'#205bb0':'#8abaff',l:'z'}].map(a=>({...a,p:rotate(a.v)})).sort((a,b)=>b.p[2]-a.p[2]);
+  const axes=[{v:[1,0,0],c:state.light?'#4a647c':'#b6cadb',l:'x'},{v:[0,1,0],c:state.light?'#4a647c':'#b6cadb',l:'y'},{v:[0,0,1],c:state.light?'#4a647c':'#b6cadb',l:'z'}].map(a=>({...a,p:rotate(a.v)})).sort((a,b)=>b.p[2]-a.p[2]);
   axes.forEach(a=>{const x=cx+a.p[0]*r,y=cy-a.p[1]*r,dx=x-cx,dy=y-cy,len=Math.hypot(dx,dy),ux=len>.01?dx/len:0,uy=len>.01?dy/len:-1;ctx.strokeStyle=a.c;ctx.fillStyle=a.c;ctx.lineWidth=3;ctx.lineCap='round';ctx.beginPath();ctx.moveTo(cx,cy);ctx.lineTo(x,y);ctx.stroke();if(len>8){ctx.beginPath();ctx.moveTo(x,y);ctx.lineTo(x-7*ux+3*uy,y-7*uy-3*ux);ctx.lineTo(x-7*ux-3*uy,y-7*uy+3*ux);ctx.closePath();ctx.fill();}ctx.font='700 16px system-ui';ctx.textAlign='center';ctx.textBaseline='middle';ctx.fillText(a.l,x+11*ux,y+11*uy);});
   ctx.fillStyle=state.light?'#22364b':'#fff';ctx.beginPath();ctx.arc(cx,cy,3,0,Math.PI*2);ctx.fill();ctx.restore();
 }
@@ -638,7 +594,7 @@ function visiblePAxes(i){
   if(state.pMode==='none')return [];
   return orbitalData[state.centers[i].kind].pAxes.map((axis,pi)=>({axis,pi}));
 }
-function selectedPWorldAxis(i,orbitalIndex=state.centers[i].selectedP||0){
+function selectedPWorldAxis(i,orbitalIndex=state.centers[i]?.selectedP||0){
   const c=state.centers[i],axes=orbitalData[c.kind].pAxes;
   if(!axes.length)return null;
   const pi=clamp(orbitalIndex,0,axes.length-1);
@@ -655,14 +611,14 @@ function pPhase(i,pi){
   }
   return c.pPhases[pi]===-1?-1:1;
 }
-function electronCount(i,type,index){return state.centers[i].electrons?.[type]?.[index]||0;}
+function electronCount(i,type,index){return state.centers[i]?.electrons?.[type]?.[index]||0;}
 let sigmaCacheKey='',sigmaCache=[];
 function sigmaOverlaps(){
   const key=JSON.stringify([state.spacing,state.lobeScale,state.autoFace,state.sigmaLock,state.centers.map(c=>[c.kind,c.selected,c.base,c.frame,c.reference,c.bondHybrid,c.pos,c.rot,c.torsion,c.electrons?.hybrid])]);
   if(key===sigmaCacheKey)return sigmaCache;
   const length=1.55*state.lobeScale,width=.54*state.lobeScale;
   const groups=state.centers.map((c,i)=>({origin:centerPosition(i),axes:orbitalData[c.kind].vectors.map(v=>applyM(centerOrientation(i),v))}));
-  function radius(q){return width*Math.pow(Math.sin(Math.PI*q),.72)*(.48+.86*q);}
+  function radius(q){return lobeRadius(q,width);}
   function inside(point,origin,axis){
     const d=sub(point,origin),ax=dot(d,axis),q=(ax-.03)/length;
     if(q<=0||q>=1)return false;
@@ -707,7 +663,7 @@ function sigmaOverlaps(){
 }
 function sigmaConnections(){return sigmaOverlaps().filter(q=>electronCount(q.a,'hybrid',q.ha)===1&&electronCount(q.b,'hybrid',q.hb)===1);}
 function sigmaBondAvailable(a,b){return sigmaConnections().some(q=>q.a===Math.min(a,b)&&q.b===Math.max(a,b));}
-function rawPiOverlap(a,b,pai=state.centers[a].selectedP||0,pbi=state.centers[b].selectedP||0){
+function rawPiOverlap(a,b,pai=state.centers[a]?.selectedP||0,pbi=state.centers[b]?.selectedP||0){
   if(state.centers.length<2)return {eligible:false,score:0,formed:false};
   const axisA=selectedPWorldAxis(a,pai),axisB=selectedPWorldAxis(b,pbi);
   if(!axisA||!axisB)return {eligible:false,score:0,formed:false,a,b};
@@ -785,22 +741,20 @@ function piOverlapMetrics(a=pairIndices()[0],b=pairIndices()[1]){
   return {...q,formed:!!assigned?.formed,blocked:q.geometryMatched&&q.inPhase&&!q.lonePair&&!assigned};
 }
 function ellipsoidMesh(center,e1,e2,e3,ra,rb,rc,tag){
-  const lat=12,lon=22,verts=[];
+  const lat=24,lon=48,verts=[],normals=[];
   for(let i=0;i<=lat;i++){
     const phi=-Math.PI/2+i/lat*Math.PI,cp=Math.cos(phi),sp=Math.sin(phi);
     for(let j=0;j<lon;j++){
       const th=j/lon*Math.PI*2,ct=Math.cos(th),st=Math.sin(th);
-      let p=center;
-      p=add(p,mul(e1,ra*cp*ct));p=add(p,mul(e2,rb*sp));p=add(p,mul(e3,rc*cp*st));
-      verts.push(p);
+      verts.push(add(center,add(mul(e1,ra*cp*ct),add(mul(e2,rb*sp),mul(e3,rc*cp*st)))));
+      normals.push(norm(add(mul(e1,cp*ct/ra),add(mul(e2,sp/rb),mul(e3,cp*st/rc)))));
     }
   }
-  const tris=[];
+  const tris=[],push=(a,b,c)=>tris.push([verts[a],verts[b],verts[c],tag,[normals[a],normals[b],normals[c]]]);
   for(let i=0;i<lat;i++)for(let j=0;j<lon;j++){
     const k=(j+1)%lon,a=i*lon+j,b=i*lon+k,c=(i+1)*lon+k,d=(i+1)*lon+j;
-    tris.push([verts[a],verts[b],verts[c],tag]);tris.push([verts[a],verts[c],verts[d],tag]);
-  }
-  return tris;
+    if(i>0)push(a,b,c);if(i<lat-1)push(a,c,d);
+  }return tris;
 }
 function piBondVisible(q){
   return state.showPiBond&&q.geometryMatched&&q.inPhase&&!q.lonePair&&!q.blocked&&visiblePAxes(q.a).some(p=>p.pi===q.pai)&&visiblePAxes(q.b).some(p=>p.pi===q.pbi);
@@ -815,7 +769,7 @@ function piBondMesh(q){
   pdir=norm(sub(pdir,mul(q.bond,dot(pdir,q.bond))));
   const side=norm(cross(q.bond,pdir)),mid=mul(add(q.A,q.B),.5);
   const along=Math.max(.62,q.dist*.53),off=.68*state.pScale,thickP=.30*state.pScale,thickSide=.24*state.pScale;
-  const alpha=.50*q.score*state.pOpacity/.68;
+  const alpha=q.score*state.pOpacity;
   const tag1={type:'piBond',formed:q.formed,a:q.a,b:q.b,pai:q.pai,pbi:q.pbi,phase:1,opacity:alpha},tag2={type:'piBond',formed:q.formed,a:q.a,b:q.b,pai:q.pai,pbi:q.pbi,phase:-1,opacity:alpha};
   return [
     ...ellipsoidMesh(add(mid,mul(pdir,off)),q.bond,pdir,side,along,thickP,thickSide,tag1),
@@ -861,11 +815,14 @@ function drawTerminalS(m){
     if(state.showLabels){
       const label=project(add(s.center,mul(s.axis,s.radius+.18)),m);
       const text=`C${s.ci+1} · h${subscript(s.oi+1)}–1s${electronCount(s.ci,'s',s.oi)===2?' · LP':terminalBonded(s)?' · σ':''}`;
-      queueLabel(text,label,state.light?'#72501b':'#ffe0a6');
+      queueLabel(text,label,state.light?'#31516c':'#c1d7e7');
     }ctx.restore();
   }
 }
+let meshCacheKey='',meshCache=[];
 function sceneTriangles(){
+  const key=JSON.stringify([state.centers,state.spacing,state.lobeScale,state.pScale,state.backScale,state.opacity,state.pOpacity,state.sOpacity,state.showBack,state.showTerminalS,state.showPiBond,state.renderMode,state.pMode,state.activeCenter,state.mode,state.attachmentHighlight,state.attachCentre,state.attachHybrid,state.newCentreKind,exporting]);
+  if(key===meshCacheKey)return meshCache;
   let tris=[];
   state.centers.forEach((c,i)=>{
     const d=orbitalData[c.kind];
@@ -874,7 +831,7 @@ function sceneTriangles(){
       tris.push(...lobeMeshWorld(i,axis,1.55*state.lobeScale,.54*state.lobeScale,{type:'hybrid',oi,back:false,ci:i,opacity:state.opacity}));
       if(state.showBack){
         const bs=state.backScale*state.lobeScale;
-        tris.push(...lobeMeshWorld(i,mul(axis,-1),1.2*bs,.62*bs,{type:'hybrid',oi,back:true,ci:i,opacity:state.opacity*.78}));
+        tris.push(...lobeMeshWorld(i,mul(axis,-1),1.2*bs,.62*bs,{type:'hybrid',oi,back:true,ci:i,opacity:state.opacity}));
       }
     });
     visiblePAxes(i).forEach(({axis,pi})=>{
@@ -883,11 +840,11 @@ function sceneTriangles(){
       tris.push(...lobeMeshWorld(i,mul(axis,-1),1.32*s,.43*s,{type:'p',pi,phase:-pPhase(i,pi),ci:i,opacity:state.pOpacity}));
     });
   });
-  tris.push(...piBondTriangles(),...terminalSTriangles(),...attachmentPreview());
-  return tris;
+  tris=tris.concat(piBondTriangles(),terminalSTriangles(),attachmentPreview());
+  meshCacheKey=key;meshCache=tris;return tris;
 }
 const subscript=n=>String(n).replace(/\d/g,d=>'₀₁₂₃₄₅₆₇₈₉'[Number(d)]);
-let sceneLabels=[];
+let sceneLabels=[];const labelOffsets=new Map();let torsionInputActive=false;
 function queueLabel(text,p,colour,priority=0){sceneLabels.push({text,p,colour,priority});}
 function paintLabels(m){
   ctx.save();ctx.font='600 14px system-ui';ctx.textAlign='center';ctx.textBaseline='middle';
@@ -901,12 +858,15 @@ function paintLabels(m){
   sceneLabels.sort((a,b)=>b.priority-a.priority);
   for(const l of sceneLabels){
     const w=ctx.measureText(l.text).width+12,h=23;let best=null,cost=Infinity;
-    for(const radius of [0,24,44,66,90])for(let k=0;k<(radius?8:1);k++){
+    const prior=labelOffsets.get(l.text),moving=state.dragging||state.spin||torsionInputActive;
+    if(!exporting&&moving&&prior){best={x:clamp(l.p.x+prior.x-w/2,6,Math.max(6,m.w-w-6)),y:clamp(l.p.y+prior.y-h/2,6,Math.max(6,m.h-h-82)),w,h};}
+    if(!best)for(const radius of [0,24,44,66,90])for(let k=0;k<(radius?8:1);k++){
       const angle=k*Math.PI/4,x=clamp(l.p.x+radius*Math.cos(angle)-w/2,6,Math.max(6,m.w-w-6)),y=clamp(l.p.y+radius*Math.sin(angle)-h/2,6,Math.max(6,m.h-h-82));
       const box={x,y,w,h},score=occupied.reduce((v,b)=>v+overlap(box,b),0)*100+radius;
       if(score<cost){cost=score;best=box;}
     }
     const {x,y}=best,cx=x+w/2,cy=y+h/2;
+    if(!exporting&&(!moving||!prior))labelOffsets.set(l.text,{x:cx-l.p.x,y:cy-l.p.y});
     if(Math.hypot(cx-l.p.x,cy-l.p.y)>18){ctx.strokeStyle=state.light?'rgba(45,65,85,.65)':'rgba(195,215,235,.65)';ctx.lineWidth=1;ctx.beginPath();ctx.moveTo(l.p.x,l.p.y);ctx.lineTo(cx,cy);ctx.stroke();}
     ctx.fillStyle=state.light?'rgba(255,255,255,.92)':'rgba(5,15,28,.91)';ctx.strokeStyle=state.light?'rgba(80,100,120,.35)':'rgba(180,210,240,.27)';ctx.lineWidth=1;ctx.beginPath();ctx.roundRect(x,y,w,h,6);ctx.fill();ctx.stroke();ctx.fillStyle=l.colour||(state.light?'#17283a':'#f0f7ff');ctx.fillText(l.text,cx,cy);occupied.push({...best,x:x-3,y:y-3,w:w+6,h:h+6});
   }ctx.restore();
@@ -916,113 +876,99 @@ function drawLabels(m){
     const d=orbitalData[c.kind];
     queueLabel(`C${i+1}`,project(centerPosition(i),m),state.light?'#005889':'#9cddff',2);
     visibleHybridIndices(i).forEach(oi=>queueLabel(`C${i+1} · h${subscript(oi+1)}`,project(localToWorld(i,mul(d.vectors[oi],1.64*state.lobeScale)),m)));
-    visiblePAxes(i).forEach(({axis,pi})=>queueLabel(`C${i+1} · p${subscript(pi+1)}`,project(localToWorld(i,mul(axis,1.44*state.pScale)),m),state.light?'#54318a':'#dfc7ff'));
+    visiblePAxes(i).forEach(({axis,pi})=>queueLabel(`C${i+1} · p${subscript(pi+1)}`,project(localToWorld(i,mul(axis,1.44*state.pScale)),m),state.light?'#31516c':'#c1d7e7'));
   });
 }
 let orbitalHitFaces=[],electronHits=[];
+function surfaceShade(normal){
+  let n=norm(normal);if(n[2]>0)n=mul(n,-1);
+  const diffuse=Math.max(0,dot(n,norm([-.45,.65,-1]))),spec=Math.pow(Math.max(0,dot(n,norm([-.20,.30,-1]))),28)*.10;
+  return {diffuse:.72+.28*diffuse,spec};
+}
+let smoothMeshRenderer;
+function makeSmoothMeshRenderer(){
+  const surface=document.createElement('canvas'),gl=surface.getContext('webgl',{alpha:true,antialias:true,premultipliedAlpha:true,preserveDrawingBuffer:false});
+  if(!gl)return null;
+  const compile=(type,source)=>{const shader=gl.createShader(type);gl.shaderSource(shader,source);gl.compileShader(shader);if(!gl.getShaderParameter(shader,gl.COMPILE_STATUS))throw Error(gl.getShaderInfoLog(shader));return shader;};
+  const vertex=compile(gl.VERTEX_SHADER,`attribute vec2 position;attribute vec3 normal;attribute vec3 colour;attribute float opacity;varying vec3 n;varying vec3 c;varying float a;void main(){gl_Position=vec4(position,0.0,1.0);n=normal;c=colour;a=opacity;}`);
+  const fragment=compile(gl.FRAGMENT_SHADER,`precision highp float;varying vec3 n;varying vec3 c;varying float a;void main(){vec3 N=normalize(n);if(N.z>0.0)N=-N;float d=max(0.0,dot(N,normalize(vec3(-.45,.65,-1.0))));float s=pow(max(0.0,dot(N,normalize(vec3(-.20,.30,-1.0)))),28.0)*.10;gl_FragColor=vec4(clamp(c*(.72+.28*d)+vec3(s),0.0,1.0),a);}`);
+  const program=gl.createProgram();gl.attachShader(program,vertex);gl.attachShader(program,fragment);gl.linkProgram(program);if(!gl.getProgramParameter(program,gl.LINK_STATUS))throw Error('Surface shader could not be linked.');
+  let data=new Float32Array(0),gpuCapacity=0;
+  const buffer=gl.createBuffer(),attributes=[['position',2,0],['normal',3,2],['colour',3,5],['opacity',1,8]].map(([name,size,offset])=>({location:gl.getAttribLocation(program,name),size,offset}));
+  return {draw(tris,m){
+    if(gl.isContextLost())return false;
+    if(surface.width!==canvas.width)surface.width=canvas.width;if(surface.height!==canvas.height)surface.height=canvas.height;
+    const length=tris.length*27;if(data.length<length)data=new Float32Array(Math.max(4096,2**Math.ceil(Math.log2(length))));let k=0;
+    for(const t of tris)for(let i=0;i<3;i++){
+      const p=i===0?t.pa:i===1?t.pb:t.pc,n=t.normals[i];data[k++]=p.x/m.w*2-1;data[k++]=1-p.y/m.h*2;
+      data[k++]=n[0];data[k++]=n[1];data[k++]=n[2];data[k++]=t.rgb[0]/255;data[k++]=t.rgb[1]/255;data[k++]=t.rgb[2]/255;data[k++]=t.alpha;
+    }
+    gl.viewport(0,0,surface.width,surface.height);gl.clearColor(0,0,0,0);gl.clear(gl.COLOR_BUFFER_BIT);gl.disable(gl.DEPTH_TEST);gl.disable(gl.CULL_FACE);gl.enable(gl.BLEND);gl.blendFuncSeparate(gl.SRC_ALPHA,gl.ONE_MINUS_SRC_ALPHA,gl.ONE,gl.ONE_MINUS_SRC_ALPHA);
+    gl.useProgram(program);gl.bindBuffer(gl.ARRAY_BUFFER,buffer);if(gpuCapacity<data.byteLength){gl.bufferData(gl.ARRAY_BUFFER,data.byteLength,gl.DYNAMIC_DRAW);gpuCapacity=data.byteLength;}gl.bufferSubData(gl.ARRAY_BUFFER,0,data.subarray(0,length));
+    for(const a of attributes){gl.enableVertexAttribArray(a.location);gl.vertexAttribPointer(a.location,a.size,gl.FLOAT,false,36,a.offset*4);}
+    gl.drawArrays(gl.TRIANGLES,0,tris.length*3);ctx.drawImage(surface,0,0,m.w,m.h);return true;
+  }};
+}
 function drawScene(){
   sceneLabels=[];const m=metrics();ctx.save();const renderScale=exporting?exportScale:state.dpr;ctx.scale(renderScale,renderScale);
   const g=ctx.createRadialGradient(m.cx,m.cy,20,m.cx,m.cy,Math.max(m.w,m.h)*.72);
-  if(state.light){g.addColorStop(0,'#fbfdff');g.addColorStop(1,'#dce7f1')}else{g.addColorStop(0,'#10243d');g.addColorStop(.58,'#07111f');g.addColorStop(1,'#02060d')}
-  ctx.fillStyle=g;ctx.fillRect(0,0,m.w,m.h);
-  if(state.showGuides)drawGuides(m);
-
-  const lightDir=norm([-.45,.75,1]),proj=sceneTriangles().map(t=>{
-    const [a,b,c,tag]=t,ra=rotate(a),rb=rotate(b),rc=rotate(c);
-    const n=norm(cross(sub(rb,ra),sub(rc,ra))),light=Math.max(-.15,dot(n,lightDir)),z=(ra[2]+rb[2]+rc[2])/3;
-    return{pa:project(a,m),pb:project(b,m),pc:project(c,m),tag,light,z};
-  }).sort((A,B)=>B.z-A.z);
-
+  if(state.light){g.addColorStop(0,'#fbfdff');g.addColorStop(1,'#e4ecf2')}else{g.addColorStop(0,'#102033');g.addColorStop(.58,'#091522');g.addColorStop(1,'#050c14')}
+  ctx.fillStyle=g;ctx.fillRect(0,0,m.w,m.h);if(state.showGuides)drawGuides(m);
+  const bonded=bondedOrbitalKeys(),tagColours=new Map(),projected=new WeakMap(),normalCache=new WeakMap();
+  const cy=Math.cos(state.yaw),sy=Math.sin(state.yaw),cp=Math.cos(state.pitch),sp=Math.sin(state.pitch);
+  const cameraRotate=v=>{const x=cy*v[0]+sy*v[2],z=-sy*v[0]+cy*v[2];return [x,cp*v[1]-sp*z,sp*v[1]+cp*z];};
+  const point=v=>{let p=projected.get(v);if(!p){const r=cameraRotate(sub(v,m.origin)),pers=1/(1+r[2]*.035),scale=m.baseScale*state.zoom*pers;p={x:m.cx+r[0]*scale,y:m.cy-r[1]*scale,z:r[2],p:pers};projected.set(v,p);}return p;};
+  const normal=n=>{let r=normalCache.get(n);if(!r){r=cameraRotate(n);normalCache.set(n,r);}return r;};
+  const proj=sceneTriangles().filter(t=>t[3].opacity>0).map(t=>{
+    const [a,b,c,tag,ns]=t,pa=point(a),pb=point(b),pc=point(c),z=(pa.z+pb.z+pc.z)/3;
+    if(!tagColours.has(tag)){
+      let base=tag.type==='preview'?tag.colour:tag.type==='hybrid'?hybridColor(tag.oi,tag.back,tag.ci):tag.type==='s'?(state.colorMode==='phase'?'#71b9eb':'#8cb9d9'):pColor(tag.phase,tag.pi??tag.pai);
+      const isBonded=bonded.has(`${tag.ci}:${tag.type}:${tag.type==='p'?tag.pi:tag.oi}`),highlighted=tag.type==='hybrid'&&state.attachmentHighlight&&tag.ci===state.attachCentre&&tag.oi===state.attachHybrid;
+      if((isBonded||(tag.type==='piBond'&&tag.formed))&&!highlighted)base=(tag.type==='p'||tag.type==='piBond')?'#ffbd80':'#20df88';
+      tagColours.set(tag,hexToRgb(base));
+    }
+    const normals=ns?ns.map(normal):[0,1,2].map(()=>cameraRotate(norm(cross(sub(b,a),sub(c,a)))));
+    // Two shell crossings compose to the requested opacity, rather than doubling it.
+    const alpha=1-Math.sqrt(1-clamp(tag.opacity,0,1));
+    return {pa,pb,pc,tag,normals,z,rgb:tagColours.get(tag),alpha};
+  }).sort((a,b)=>b.z-a.z);
   orbitalHitFaces=proj.filter(t=>['hybrid','p','s'].includes(t.tag.type));
-  const bonded= bondedOrbitalKeys();
-  proj.forEach(t=>{
-    let base;
-    if(t.tag.type==='preview')base=t.tag.colour;
-    else if(t.tag.type==='hybrid')base=hybridColor(t.tag.oi,t.tag.back,t.tag.ci);
-    else if(t.tag.type==='s')base=state.colorMode==='phase'?'#42a5f5':state.colorMode==='mono'?'#dce5ee':'#ffc66d';
-    else if(t.tag.type==='piBond')base=pColor(t.tag.phase,t.tag.pai);
-    else base=pColor(t.tag.phase,t.tag.pi);
-    const isBonded=bonded.has(`${t.tag.ci}:${t.tag.type}:${t.tag.type==='p'?t.tag.pi:t.tag.oi}`);
-    const highlighted=t.tag.type==='hybrid'&&state.attachmentHighlight&&t.tag.ci===state.attachCentre&&t.tag.oi===state.attachHybrid;
-    if((isBonded||(t.tag.type==='piBond'&&t.tag.formed))&&!highlighted)base=(t.tag.type==='p'||t.tag.type==='piBond')?'#ffbd80':'#20df88';
-    const shade=(t.light-.35)*.34;
+  let smooth=false;
+  if(!exporting){try{if(smoothMeshRenderer===undefined)smoothMeshRenderer=makeSmoothMeshRenderer();smooth=!!smoothMeshRenderer?.draw(proj,m);}catch(error){smoothMeshRenderer=null;}}
+  // SVG and PDF retain real vector triangles. The CPU path also supports browsers without WebGL.
+  if(!smooth)for(const t of proj){
+    const shade=surfaceShade(mul(add(add(t.normals[0],t.normals[1]),t.normals[2]),1/3));
     ctx.beginPath();ctx.moveTo(t.pa.x,t.pa.y);ctx.lineTo(t.pb.x,t.pb.y);ctx.lineTo(t.pc.x,t.pc.y);ctx.closePath();
-    ctx.globalAlpha=t.tag.opacity;ctx.fillStyle=mixColor(base,shade);ctx.fill();
-  });
-  ctx.globalAlpha=1;
-  state.centers.forEach((_,i)=>drawNucleus(i,m));
-  if(state.showLabels)drawLabels(m);
-  drawTerminalS(m);
-  drawElectrons(m);
-  for(const pq of allPiOverlaps()){
-  if(state.showLabels && piBondVisible(pq)){
+    ctx.globalAlpha=t.alpha;ctx.fillStyle=`rgb(${t.rgb.map(n=>Math.round(clamp(n*shade.diffuse+255*shade.spec,0,255))).join(',')})`;ctx.fill();
+  }
+  ctx.globalAlpha=1;state.centers.forEach((_,i)=>drawNucleus(i,m));
+  if(state.showLabels)drawLabels(m);drawTerminalS(m);drawElectrons(m);
+  for(const pq of allPiOverlaps())if(state.showLabels&&piBondVisible(pq)){
     const mid=mul(add(pq.A,pq.B),.5),lab=project(add(mid,mul(norm(add(pq.pa,mul(pq.pb,dot(pq.pa,pq.pb)>=0?1:-1))),1.12*state.pScale)),m);
-    queueLabel(`${pq.formed?'π bond':'π overlap'} · C${pq.a+1}–C${pq.b+1}`,lab,pq.formed?(state.light?'#9b4e13':'#ffbd80'):(state.light?'#54318a':'#dfc7ff'),1);
+    queueLabel(`${pq.formed?'π bond':'π overlap'} · C${pq.a+1}–C${pq.b+1}`,lab,pq.formed?(state.light?'#9b4e13':'#ffbd80'):(state.light?'#31516c':'#c1d7e7'),1);
   }
-  }
-  if(state.showLabels)paintLabels(m);if(state.showAxes)drawAxes(m);
-  ctx.restore();
+  if(state.showLabels)paintLabels(m);if(state.showAxes)drawAxes(m);ctx.restore();
 }
 function hybridLabel(kind){return orbitalData[kind].label}
 function activateCenter(i){
-  state.activeCenter=i;
-  $('centersList').querySelectorAll('.center-card').forEach((card,k)=>{
-    card.classList.toggle('active',k===i);
-    card.querySelector('.activate').textContent=k===i?'Active':'Edit';
-  });
-  updateInfo();refreshDisplay();
+  if(!state.centers[i])return;
+  state.activeCenter=i;updateCentersUI();updateInfo();refreshDisplay();
 }
+
 function updateCentersUI(){
-  const list=$('centersList');list.innerHTML='';
-  const [pairA,pairB]=pairIndices();
-  state.centers.forEach((c,i)=>{
-    if(!c.pos)c.pos=[0,0,0];if(!c.rot)c.rot=[0,0,0];if(c.selectedP==null)c.selectedP=0;if(c.torsion==null)c.torsion=0;
-    const d=orbitalData[c.kind],locked=state.sigmaLock&&bondNeighbor(i)>=0;
-    const card=document.createElement('div');card.className='center-card'+(i===state.activeCenter?' active':'');
-    const opts=Object.keys(orbitalData).map(k=>`<option value="${k}" ${k===c.kind?'selected':''}>${orbitalData[k].label}</option>`).join('');
-    const hOpts=d.vectors.map((_,k)=>`<option value="${k}" ${k===c.selected?'selected':''}>h${k+1}</option>`).join('');
-    const pOpts=d.pAxes.length?d.pAxes.map((_,k)=>`<option value="${k}" ${k===c.selectedP?'selected':''}>p${k+1}</option>`).join(''):'<option value="0">none</option>';
-    const transRows=['X','Y','Z'].map((ax,k)=>`
-      <div class="transform-row"><span class="axis">${ax}</span>
-      <input class="posSlider" data-i="${i}" data-k="${k}" type="range" min="-3.00" max="3.00" step="0.05" value="${c.pos[k]}">
-      <span class="tval posVal" data-i="${i}" data-k="${k}">${c.pos[k].toFixed(2)}</span></div>`).join('');
-    const rotationRows=locked?`
-      <div class="transform-row"><span class="axis">τ</span>
-      <input class="torsionSlider" data-i="${i}" type="range" min="-180" max="180" step="1" value="${c.torsion}">
-      <span class="tval torsionVal" data-i="${i}">${Math.round(c.torsion)}°</span></div>
-      <div class="preset-note">σ locked: reference hybrid stays on the attachment bond axis. Only torsion τ about that axis is permitted.</div>`:
-      ['X','Y','Z'].map((ax,k)=>`
-      <div class="transform-row"><span class="axis">R${ax}</span>
-      <input class="rotSlider" data-i="${i}" data-k="${k}" type="range" min="-180" max="180" step="1" value="${c.rot[k]}">
-      <span class="tval rotVal" data-i="${i}" data-k="${k}">${Math.round(c.rot[k])}°</span></div>`).join('');
-
-    card.innerHTML=`
-      <div class="center-head"><span class="center-dot" style="background:${centerColors[i%centerColors.length]}"></span><strong>Centre ${i+1}</strong><button class="mini activate" data-i="${i}">${i===state.activeCenter?'Active':'Edit'}</button></div>
-      <div class="center-fields">
-        <label>Group<select class="kindSel" data-i="${i}">${opts}</select></label>
-        <label>Selected hybrid<select class="orbSel" data-i="${i}">${hOpts}</select></label>
-        <label>Selected p<select class="pSel" data-i="${i}" ${d.pAxes.length?'':'disabled'}>${pOpts}</select></label>
-        <label>Selected p phase<select class="phaseSel" data-i="${i}" ${d.pAxes.length?'':'disabled'}><option value="1" ${pPhase(i,c.selectedP)===1?'selected':''}>+ sign</option><option value="-1" ${pPhase(i,c.selectedP)===-1?'selected':''}>− sign (inverted)</option></select></label>
-      </div>
-      <div class="transform-block">
-        <div class="transform-title"><span>Translation (relative to attachment position)</span><button class="mini resetCenter" data-i="${i}">Reset</button></div>
-        ${transRows}
-        <div class="transform-title" style="margin-top:8px"><span>${locked?'Rotation about σ bond':'Free rotation'}</span><span class="status-pill">${locked?'torsion only':'XYZ'}</span></div>
-        ${rotationRows}
-      </div>`;
-    list.appendChild(card);
-  });
-
-  list.querySelectorAll('.activate').forEach(b=>b.onclick=()=>{state.activeCenter=+b.dataset.i;syncAllUI()});
-  list.querySelectorAll('.kindSel').forEach(s=>s.onchange=()=>{setCenterKind(+s.dataset.i,s.value)});
-  list.querySelectorAll('.orbSel').forEach(s=>s.onchange=()=>{const i=+s.dataset.i;state.centers[i].selected=+s.value;state.centers[i].torsion=0;state.activeCenter=i;syncAllUI()});
-  list.querySelectorAll('.pSel').forEach(s=>s.onchange=()=>{const i=+s.dataset.i;state.centers[i].selectedP=+s.value;state.activeCenter=i;syncAllUI()});
-  list.querySelectorAll('.phaseSel').forEach(el=>el.onchange=()=>{const i=+el.dataset.i;pPhase(i,state.centers[i].selectedP);state.centers[i].pPhases[state.centers[i].selectedP]=+el.value;state.activeCenter=i;syncAllUI()});
-  list.querySelectorAll('.posSlider').forEach(sl=>sl.oninput=()=>{const i=+sl.dataset.i,k=+sl.dataset.k;state.centers[i].pos[k]=+sl.value;activateCenter(i);const v=list.querySelector(`.posVal[data-i="${i}"][data-k="${k}"]`);if(v)v.textContent=(+sl.value).toFixed(2);updateInfo();updatePiStatus()});
-  list.querySelectorAll('.rotSlider').forEach(sl=>sl.oninput=()=>{const i=+sl.dataset.i,k=+sl.dataset.k;state.centers[i].rot[k]=+sl.value;activateCenter(i);const v=list.querySelector(`.rotVal[data-i="${i}"][data-k="${k}"]`);if(v)v.textContent=`${Math.round(+sl.value)}°`;updateInfo();updatePiStatus()});
-  list.querySelectorAll('.torsionSlider').forEach(sl=>sl.oninput=()=>{const i=+sl.dataset.i;state.centers[i].torsion=+sl.value;activateCenter(i);const v=list.querySelector(`.torsionVal[data-i="${i}"]`);if(v)v.textContent=`${Math.round(+sl.value)}°`;updateInfo();updatePiStatus()});
-  list.querySelectorAll('.resetCenter').forEach(b=>b.onclick=()=>{const i=+b.dataset.i,c=state.centers[i];c.pos=[0,0,0];c.rot=[0,0,0];c.torsion=0;state.activeCenter=i;syncAllUI()});
+  $('activeCentreSelect').innerHTML=state.centers.map((c,i)=>`<option value="${i}" ${i===state.activeCenter?'selected':''}>C${i+1} · ${hybridLabel(c.kind)}</option>`).join('');
+  const list=$('centersList'),i=state.activeCenter,c=state.centers[i];list.innerHTML='';if(!c)return;
+  const d=orbitalData[c.kind];
+  $('enterRotation').disabled=!rotationNeighbours(i).length;
+  if(d.pAxes.length){
+    list.innerHTML=`<details><summary>p-orbital phase & inspection</summary><label for="selectedP">Inspect p orbital</label><select id="selectedP">${d.pAxes.map((_,k)=>`<option value="${k}" ${k===c.selectedP?'selected':''}>p${k+1}</option>`).join('')}</select><label for="selectedPhase">Relative sign</label><select id="selectedPhase"><option value="1" ${pPhase(i,c.selectedP)===1?'selected':''}>Original sign</option><option value="-1" ${pPhase(i,c.selectedP)===-1?'selected':''}>Inverted sign</option></select><p class="note">The two lobes of a p orbital have opposite signs. Changing its overall sign changes its phase relative to its partner.</p></details>`;
+    $('selectedP').onchange=e=>{c.selectedP=Number(e.target.value);syncAllUI();};
+    $('selectedPhase').onchange=e=>{pPhase(i,c.selectedP);c.pPhases[c.selectedP]=Number(e.target.value);refreshDisplay();};
+  }
 }
+$('activeCentreSelect').onchange=e=>activateCenter(Number(e.target.value));
+$('enterRotation').onclick=()=>{setMode('rotate');setMobileControls(false);};
+
 function updateOverlapPairs(){
   const sel=$('overlapPair'),pairs=centrePairs();
   if(!pairs.length){sel.innerHTML='<option>No pair available</option>';sel.disabled=true;state.overlapPair=0;return;}
@@ -1030,7 +976,9 @@ function updateOverlapPairs(){
   sel.innerHTML=pairs.map(([a,b],k)=>`<option value="${k}" ${k===state.overlapPair?'selected':''}>Centre ${a+1} ↔ Centre ${b+1}</option>`).join('');
 }
 function updateInfo(){
-  const c=state.centers[state.activeCenter],d=orbitalData[c.kind];
+  const c=state.centers[state.activeCenter];
+  if(!c){['geometryInfo','countInfo','angleInfo','sInfo','mixInfo','pInfo'].forEach(id=>$(id).textContent='—');$('chemNote').textContent='Add a centre to inspect its geometry.';$('viewTitle').textContent='Empty workspace';$('viewSubtitle').textContent='Add your first centre.';return;}
+  const d=orbitalData[c.kind];
   $('geometryInfo').textContent=d.geometry;$('countInfo').textContent=d.vectors.length;$('angleInfo').textContent=d.angles;
   $('sInfo').textContent=d.s;$('mixInfo').textContent=d.mix;$('pInfo').textContent=d.pAxes.length;$('chemNote').textContent=d.note;
   document.querySelectorAll('#hybridButtons button').forEach(b=>b.classList.toggle('active',b.dataset.kind===c.kind));
@@ -1046,6 +994,7 @@ function updatePiStatus(){
   updateRotationPanel();
   updateBondSound();
   const sigma=sigmaConnections();
+  updateLegend();
   $('sigmaStatus').textContent=sigma.length?'σ bonds (one electron from each hybrid): '+sigma.map(q=>`C${q.a+1} h${q.ha+1}–C${q.b+1} h${q.hb+1}`).join('; '):sigmaOverlaps().length?'Hybrids overlap: add one electron to each overlapping hybrid to form a σ bond.':'No head-on hybrid overlap.';
   syncDisplayControls();
   updateAttachmentUI();
@@ -1078,14 +1027,17 @@ function updateSelectedPiStatus(){
   el.innerHTML=`<strong>C${a+1} p${subscript((state.centers[a].selectedP||0)+1)} ↔ C${b+1} p${subscript((state.centers[b].selectedP||0)+1)}</strong><br>Signed π overlap: <strong>${shown}%</strong><div class="pi-meter signed" role="meter" aria-label="Signed pi overlap" aria-valuemin="-100" aria-valuemax="100" aria-valuenow="${pct.toFixed(1)}" aria-valuetext="${shown} percent; ${pct<0?'out of phase':pct>0?'in phase':'zero overlap'}"><span style="left:${pct<0?50+pct/2:50}%;width:${Math.abs(pct)/2}%;background:${pct<0?'#ef7c82':'#79bfff'}"></span></div><div class="pi-scale"><span>−100% · out of phase</span><span>0</span><span>+100% · in phase</span></div><div style="margin-top:6px">Transverse phase angle: ${angle===null?'—':angle.toFixed(1)+'°'} · proximity: ${Math.round(q.distanceScore*100)}%</div><div style="margin-top:6px">${reason}</div><div class="note">Signed schematic alignment × proximity, not electron density or bond strength. Electrons do not change this value.</div>`;
 }
 function updateLegend(){
-  const items=[],hybrids=state.centers.some((_,i)=>visibleHybridIndices(i).length),ps=state.centers.some((_,i)=>visiblePAxes(i).length),ss=terminalSOrbitals().length>0;
-  if((state.colorMode==='phase'&&(hybrids||ss))||(state.pMode==='phase'&&ps))items.push(['#42a5f5','positive phase'],['#ef5350','negative phase']);
-  if(hybrids&&state.colorMode!=='phase')items.push([state.colorMode==='mono'?'#dce5ee':'#4cc9f0','hybrid orbitals']);
-  if(ps&&state.pMode!=='phase')items.push(['#8b5cf6','unhybridized p']);
-  if(ss&&state.colorMode!=='phase')items.push([state.colorMode==='mono'?'#dce5ee':'#ffc66d','terminal 1s']);
-  items.push(['#20df88','σ bond formed'],['#ffbd80','π bond formed']);
+  const items=[];
+  if(state.centers.length){
+    const phases=state.colorMode==='phase'||state.pMode==='phase';
+    if(phases)items.push(['#71b9eb','+ phase'],['#ef7777','− phase']);else items.push(['#8cb9d9','orbitals']);
+    if(sigmaConnections().length||terminalSOrbitals().some(terminalBonded))items.push(['#20df88','σ bond']);
+    if(allPiOverlaps().some(q=>q.formed))items.push(['#ffbd80','π bond']);
+    if(state.attachmentHighlight)items.push(['#ffff00','selected hybrid']);
+  }
   $('legend').innerHTML=items.map(([c,t])=>`<span class="legend-item"><span class="swatch" style="background:${c}"></span>${t}</span>`).join('');
 }
+
 function syncDisplayControls(){
   const hybrids=state.centers.some((_,i)=>visibleHybridIndices(i).length);
   const hasP=state.centers.some(c=>orbitalData[c.kind].pAxes.length);
@@ -1098,11 +1050,12 @@ function syncDisplayControls(){
 }
 function refreshDisplay(){updatePiControls();updateLegend();updatePiStatus();}
 function setCenterKind(i,kind){
-  const c=state.centers[i];if(!orbitalData[kind])return;
+  const c=state.centers[i];if(!c||!orbitalData[kind])return;
   c.kind=kind;c.bondHybrid=0;c.selected=0;c.selectedP=0;c.torsion=0;c.pPhases=null;c.electrons={};c.electronLobes={};
   state.activeCenter=i;syncAllUI();
 }
 function updatePiControls(){
+  if(!state.centers.length){$('piPreset').disabled=true;$('showPiBond').disabled=true;$('piControlsInfo').textContent='Add two centres to explore orbital overlap.';syncDisplayControls();return;}
   const [a,b]=pairIndices(),hasPair=state.centers.length>1;
   const na=orbitalData[state.centers[a].kind].pAxes.length,nb=orbitalData[state.centers[b].kind].pAxes.length;
   const freeA=orbitalData[state.centers[a].kind].pAxes.filter((_,k)=>electronCount(a,'p',k)<2).length,freeB=orbitalData[state.centers[b].kind].pAxes.filter((_,k)=>electronCount(b,'p',k)<2).length;
@@ -1115,15 +1068,18 @@ function updatePiControls(){
   syncDisplayControls();
 }
 function syncAllUI(){
-  state.activeCenter=clamp(state.activeCenter,0,state.centers.length-1);
+  state.activeCenter=clamp(state.activeCenter,0,Math.max(0,state.centers.length-1));
   updateOverlapPairs();updateCentersUI();updateInfo();updateLegend();updatePiStatus();
-  $('removeCenter').disabled=state.centers.length<=1;updateAttachmentUI();
+  $('removeCenter').disabled=!state.centers.length;updateAttachmentUI();
+  $('emptyWorkspace').hidden=state.centers.length>0;$('activeTools').hidden=!state.centers.length;$('resetLesson').disabled=!state.lesson;$('clearWorkspace').disabled=!state.centers.length;
+  $('overlapDescription').hidden=!state.showOverlapDescription||!state.centers.length;
   $('autoFace').disabled=state.sigmaLock||state.centers.length<2;
   $('sigmaLock').disabled=state.centers.length<2;
   updatePiControls();
   $('spacing').disabled=state.centers.length<2;
 }
 function resetView(){
+  reframeScene();
   state.yaw=-.55;state.pitch=.42;state.zoom=1;$('zoom').value='1';$('zoomVal').textContent='1.00×';
 }
 
@@ -1142,6 +1098,8 @@ function attachmentTarget(){
   return {direction,position:add(centerPosition(i),mul(direction,state.spacing))};
 }
 function updateAttachmentUI(){
+  const empty=!state.centers.length;$('attachmentFields').hidden=empty;$('addCenter').textContent=empty?'+ Add first centre':'+ Attach centre';
+  if(empty){state.attachCentre=0;state.attachHybrid=-1;state.attachmentHighlight=false;state.pickAttachment=false;$('attachCentre').innerHTML='';$('attachHybrid').innerHTML='';$('addCenter').disabled=false;$('attachmentStatus').textContent='Choose a hybridization, then add your first centre.';return;}
   state.attachCentre=clamp(state.attachCentre,0,state.centers.length-1);
   const i=state.attachCentre,c=state.centers[i],d=orbitalData[c.kind];
   $('attachCentre').innerHTML=state.centers.map((x,k)=>`<option value="${k}" ${k===i?'selected':''}>Centre ${k+1} · ${hybridLabel(x.kind)}</option>`).join('');
@@ -1156,15 +1114,18 @@ function updateAttachmentUI(){
 }
 $('attachCentre').onchange=e=>{state.attachmentHighlight=false;state.attachCentre=+e.target.value;state.attachHybrid=-1;activateCenter(state.attachCentre);updateAttachmentUI()};
 $('attachHybrid').onchange=e=>{setMode('build',false);state.attachmentHighlight=true;state.attachHybrid=+e.target.value;updateAttachmentUI()};
-$('newCentreKind').onchange=e=>{setMode('build',false);state.newCentreKind=e.target.value;updateAttachmentUI()};
+$('newCentreKind').onchange=e=>{setMode('build',false);state.newCentreKind=e.target.value;$('firstCentreKind').value=state.newCentreKind;updateAttachmentUI()};
+$('firstCentreKind').onchange=e=>{state.newCentreKind=e.target.value;$('newCentreKind').value=state.newCentreKind;};
+$('addFirstCenter').onclick=()=>$('addCenter').click();
 $('pickAttachment').onclick=()=>{const wasPicking=state.pickAttachment;setMode('build');state.pickAttachment=!wasPicking;if(state.pickAttachment){state.renderMode='all';$('renderMode').value='all';setMobileControls(false);}else{state.attachmentHighlight=false;}refreshDisplay();updateAttachmentUI()};
 $('addCenter').onclick=()=>{
   updateAttachmentUI();if($('addCenter').disabled)return;
+  if(!state.centers.length){state.centers.push({kind:state.newCentreKind,selected:0,selectedP:0,base:[0,0,0],frame:identityMatrix(),reference:null,bondHybrid:0,pos:[0,0,0],rot:[0,0,0],torsion:0,electrons:{}});state.activeCenter=0;state.lesson='';syncAllUI();workspaceMessage('First centre added. Select a free hybrid to attach the next centre.');return;}
   const parent=state.attachCentre,h=state.attachHybrid,{direction,position}=attachmentTarget(),kind=state.newCentreKind;
-  const frame=attachmentFrame();
+  const frame=attachmentFrame(),parentOrientation=centerOrientation(parent);
   /* orientation computed identically for preview and placement */
   state.centers.push({kind,selected:0,selectedP:0,base:mul(position,1/state.spacing),frame,reference:parent,bondHybrid:0,pos:[0,0,0],rot:[0,0,0],torsion:0});
-  const child=state.centers.length-1;state.activeCenter=child;state.pickAttachment=false;
+  const child=state.centers.length-1;if(bondNeighbor(parent)<0){Object.assign(state.centers[parent],{frame:parentOrientation,reference:child,bondHybrid:h,rot:[0,0,0],torsion:0});}state.activeCenter=child;state.pickAttachment=false;
   state.overlapPair=centrePairs().findIndex(([a,b])=>a===parent&&b===child);
   state.attachmentHighlight=false;state.attachCentre=child;state.attachHybrid=-1;syncAllUI();
 };
@@ -1179,35 +1140,28 @@ function attachmentFrame(){
   return frame;
 }
 $('removeCenter').onclick=()=>{
-  if(state.centers.length<=1)return;
+  if(!state.centers.length)return;
   const removed=state.centers.length-1;
   state.centers.forEach((c,i)=>{if(c.reference===removed){c.frame=centerOrientation(i);c.reference=null;c.rot=[0,0,0];c.torsion=0;}});
-  state.centers.pop();state.activeCenter=Math.min(state.activeCenter,state.centers.length-1);syncAllUI();
+  state.centers.pop();state.activeCenter=Math.max(0,Math.min(state.activeCenter,state.centers.length-1));state.attachmentHighlight=false;state.attachHybrid=-1;syncAllUI();
 };
 $('piPreset').onclick=()=>{
   if($('piPreset').disabled)return;
   const [a,b]=pairIndices();
-  [a,b].forEach(i=>{const c=state.centers[i];c.pos=[0,0,0];c.rot=[0,0,0];c.torsion=0;});
-  state.spacing=2.30*state.pScale/.86;
-  state.spacing=clamp(Math.round(state.spacing/0.05)*0.05,1.20,4.20);
-  $('spacing').value=state.spacing;$('spacingVal').textContent=state.spacing.toFixed(2);
-  state.sigmaLock=true;$('sigmaLock').checked=true;
-  state.autoFace=true;$('autoFace').checked=true;
-  [a,b].forEach(i=>{if(electronCount(i,'p',state.centers[i].selectedP)===2)state.centers[i].selectedP=orbitalData[state.centers[i].kind].pAxes.findIndex((_,k)=>electronCount(i,'p',k)<2)});
+  if(!chooseRotationBond(b,a)){workspaceMessage('Select two centres sharing a σ axis.');return;}
   const pa=selectedPWorldAxis(a),pb=selectedPWorldAxis(b),axis=centerBondAxis(b);
-  state.centers[b].torsion=Math.atan2(dot(axis,cross(pb,pa)),clamp(dot(pb,pa),-1,1))*180/Math.PI;
-  // Choose constructive relative signs for every aligned orbital on this pair.
+  const delta=Math.atan2(dot(axis,cross(pb,pa)),clamp(dot(pb,pa),-1,1))*180/Math.PI;
+  twistCentre(b,wrapDegrees((state.centers[b].torsion||0)+delta));
   orbitalData[state.centers[b].kind].pAxes.forEach((_,bi)=>{
-    const axisB=selectedPWorldAxis(b,bi);
-    const matches=orbitalData[state.centers[a].kind].pAxes.map((_,ai)=>({ai,d:dot(selectedPWorldAxis(a,ai),axisB)})).sort((x,y)=>Math.abs(y.d)-Math.abs(x.d));
+    const axisB=selectedPWorldAxis(b,bi),matches=orbitalData[state.centers[a].kind].pAxes.map((_,ai)=>({ai,d:dot(selectedPWorldAxis(a,ai),axisB)})).sort((x,y)=>Math.abs(y.d)-Math.abs(x.d));
     if(matches.length&&Math.abs(matches[0].d)>.94){pPhase(b,bi);state.centers[b].pPhases[bi]=pPhase(a,matches[0].ai)*(matches[0].d<0?-1:1);}
-  });
-  state.activeCenter=a;syncAllUI();
+  });state.activeCenter=b;syncAllUI();
 };
-$('resetTransforms').onclick=()=>{
-  state.centers.forEach(c=>{c.pos=[0,0,0];c.rot=[0,0,0];c.torsion=0});
-  syncAllUI();
-};
+$('resetTransforms').onclick=()=>{state.centers.forEach((_,i)=>twistCentre(i,0));syncAllUI();};
+function newProject(){
+  endHistory();beginHistory();stopDrag();state.centers=[];state.activeCenter=0;state.attachCentre=0;state.attachHybrid=-1;state.pickAttachment=false;state.attachmentHighlight=false;state.lesson='';state.mode='build';reframeScene();syncWorkspace();endHistory();workspaceMessage('New project started. Settings kept; Undo restores the previous structure.');
+}
+$('clearWorkspace').onclick=newProject;$('newProject').onclick=newProject;
 $('spacing').oninput=e=>{state.spacing=+e.target.value;$('spacingVal').textContent=state.spacing.toFixed(2);updatePiStatus()};
 $('autoFace').onchange=e=>{state.autoFace=e.target.checked;syncAllUI()};
 $('sigmaLock').onchange=e=>{state.sigmaLock=e.target.checked;if(state.sigmaLock){state.autoFace=true;$('autoFace').checked=true}syncAllUI()};
@@ -1216,8 +1170,9 @@ $('overlapPair').onchange=e=>{state.overlapPair=+e.target.value;syncAllUI()};
 $('renderMode').onchange=e=>{state.renderMode=e.target.value;refreshDisplay()};
 $('showTerminalS').onchange=e=>{state.showTerminalS=e.target.checked;refreshDisplay()};
 $('sOpacity').oninput=e=>{state.sOpacity=+e.target.value;$('sOpacityVal').textContent=state.sOpacity.toFixed(2)};
-$('pMode').onchange=e=>{state.pMode=e.target.value;refreshDisplay()};
-$('colorMode').onchange=e=>{state.colorMode=e.target.value;updateLegend()};
+$('pMode').onchange=e=>{state.pMode=e.target.value;if(state.pMode!=='none'){state.colorMode=state.pMode==='phase'?'phase':'mono';$('colorMode').value=state.colorMode;}refreshDisplay()};
+$('colorMode').onchange=e=>{state.colorMode=e.target.value;if(state.pMode!=='none'){state.pMode=state.colorMode==='phase'?'phase':'all';$('pMode').value=state.pMode;}updateLegend()};
+$('transparency').oninput=e=>{state.opacity=state.pOpacity=state.sOpacity=1-Number(e.target.value)/100;$('transparencyVal').textContent=e.target.value+'%';};
 $('showBack').onchange=e=>{state.showBack=e.target.checked;syncDisplayControls()};
 $('showAxes').onchange=e=>state.showAxes=e.target.checked;
 $('showGuides').onchange=e=>state.showGuides=e.target.checked;
@@ -1231,6 +1186,7 @@ $('pSize').oninput=e=>{state.pScale=+e.target.value;$('pSizeVal').textContent=st
 $('backSize').oninput=e=>{state.backScale=+e.target.value;$('backSizeVal').textContent=state.backScale.toFixed(2)+'×'};
 $('zoom').oninput=e=>{state.zoom=+e.target.value;$('zoomVal').textContent=state.zoom.toFixed(2)+'×'};
 $('resetView').onclick=resetView;
+$('controlsTheme').onchange=e=>{state.controlsTheme=e.target.value;document.body.classList.toggle('controls-light',state.controlsTheme==='light');};
 $('bgToggle').onclick=()=>{state.light=!state.light;stage.classList.toggle('light',state.light);$('bgToggle').textContent=state.light?'Dark background':'Light background'};
 
 function electronAnchors(){
@@ -1288,35 +1244,78 @@ function pickCenter(clientX,clientY){
   const hits=state.centers.map((_,i)=>{const p=project(centerPosition(i),m);return {i,z:p.z,d:Math.hypot(p.x-x,p.y-y)};});
   return hits.filter(h=>h.d<=Math.max(18,m.baseScale*.05*state.zoom+9)).sort((a,b)=>a.d-b.d||a.z-b.z)[0]?.i??-1;
 }
+// Attachment geometry stays connected even before its electrons are added.
+function structuralLinks(){
+  const links=sigmaOverlaps().map(q=>({...q})),seen=new Set(links.map(q=>`${q.a}:${q.b}`));
+  state.centers.forEach((c,i)=>{
+    const j=bondNeighbor(i);if(j<0)return;
+    const a=Math.min(i,j),b=Math.max(i,j),key=`${a}:${b}`;if(seen.has(key))return;
+    const axis=norm(sub(centerPosition(j),centerPosition(i))),own=orbitalData[c.kind].vectors.map(v=>dot(applyM(centerOrientation(i),v),axis)),other=orbitalData[state.centers[j].kind].vectors.map(v=>-dot(applyM(centerOrientation(j),v),axis));
+    const hi=own.indexOf(Math.max(...own)),hj=other.indexOf(Math.max(...other));
+    if(own[hi]>.98&&other[hj]>.98){links.push({a,b,ha:i===a?hi:hj,hb:i===a?hj:hi});seen.add(key);}
+  });
+  return links;
+}
+function rotationNeighbours(i){return structuralLinks().filter(q=>q.a===i||q.b===i).map(q=>q.a===i?q.b:q.a);}
+function chooseRotationBond(i,j){
+  const q=structuralLinks().find(q=>(q.a===i&&q.b===j)||(q.a===j&&q.b===i));if(!q)return false;
+  const c=state.centers[i],frame=centerOrientation(i);
+  if(c.reference===j&&c.bondHybrid===(q.a===i?q.ha:q.hb))return true;
+  Object.assign(c,{frame,reference:j,bondHybrid:q.a===i?q.ha:q.hb,rot:[0,0,0],torsion:0});return true;
+}
+function torsionGroup(i,j){
+  if(!state.centers[i]||j<0)return {indices:[],locked:false};
+  const edges=structuralLinks().filter(q=>!((q.a===i&&q.b===j)||(q.a===j&&q.b===i))),visited=new Set([i]),queue=[i];
+  for(let k=0;k<queue.length;k++)for(const q of edges){const n=q.a===queue[k]?q.b:q.b===queue[k]?q.a:-1;if(n>=0&&!visited.has(n)){visited.add(n);queue.push(n);}}
+  return {indices:queue,locked:visited.has(j)};
+}
+function twistCentre(i,value){
+  const c=state.centers[i],j=bondNeighbor(i),group=torsionGroup(i,j);if(!c||j<0||group.locked)return false;
+  const next=clamp(Number(value),-180,180),delta=next-(c.torsion||0),pivot=centerPosition(i),axis=centerBondAxis(i),R=axisAngleMatrix(axis,delta);
+  // Preserve phase conventions and all local frames before moving the fragment.
+  state.centers.forEach((c,k)=>orbitalData[c.kind].pAxes.forEach((_,pi)=>pPhase(k,pi)));
+  const before=group.indices.map(k=>({k,M:centerOrientation(k),P:centerPosition(k)}));
+  for(const {k,P} of before){state.centers[k].base=mul(add(pivot,applyM(R,sub(P,pivot))),1/state.spacing);state.centers[k].pos=[0,0,0];}
+  c.torsion=next;
+  for(const {k,M} of before){const item=state.centers[k],rotated=matMul(R,M),undoTwist=bondNeighbor(k)>=0?axisAngleMatrix(centerBondAxis(k),-(item.torsion||0)):identityMatrix();item.frame=matMul(undoTwist,rotated);item.rot=[0,0,0];}
+  return true;
+}
 function updateRotationPanel(){
-  const panel=$('rotationPanel');panel.hidden=state.mode!=='rotate';if(panel.hidden)return;
-  const i=state.activeCenter,c=state.centers[i],j=bondNeighbor(i);
+  const panel=$('rotationPanel');panel.hidden=state.mode!=='rotate'||!state.centers.length;if(panel.hidden)return;
+  const i=state.activeCenter,c=state.centers[i],neighbours=rotationNeighbours(i);
+  if(!neighbours.includes(bondNeighbor(i))&&neighbours.length)chooseRotationBond(i,neighbours[0]);
+  const j=bondNeighbor(i),group=torsionGroup(i,j),disabled=j<0||group.locked;
   if(j>=0){const pair=centrePairs().findIndex(([a,b])=>a===Math.min(i,j)&&b===Math.max(i,j));if(pair>=0&&pair!==state.overlapPair){state.overlapPair=pair;updateOverlapPairs();updateInfo();}}
-  $('rotateCentre').innerHTML=state.centers.map((_,k)=>`<option value="${k}" ${i===k?'selected':''}>Centre ${k+1}</option>`).join('');
-  $('quickTorsion').value=c.torsion||0;$('quickTorsion').disabled=j<0;$('torsionZero').disabled=j<0;$('torsionQuarter').disabled=j<0;
-  $('rotationAxisLabel').textContent=j<0?'No reference σ axis':`C${i+1}–C${j+1} axis · ${Math.round(c.torsion||0)}°`;
-  $('torsionHelp').textContent=j<0?'Attach another centre to define a σ axis.': 'Only this centre rotates. For an initially aligned sp² pair, a 90° relative twist removes π overlap while preserving σ overlap.';
+  const centreOptions=state.centers.map((_,k)=>`<option value="${k}" ${i===k?'selected':''}>Centre ${k+1}</option>`).join('');
+  if($('rotateCentre').innerHTML!==centreOptions)$('rotateCentre').innerHTML=centreOptions;
+  const bondOptions=neighbours.length?neighbours.map(k=>`<option value="${k}" ${j===k?'selected':''}>C${i+1}–C${k+1}</option>`).join(''):'<option>No σ axis yet</option>';
+  if($('rotationBond').innerHTML!==bondOptions)$('rotationBond').innerHTML=bondOptions;
+  $('rotationBond').disabled=neighbours.length<2;
+  $('quickTorsion').value=c.torsion||0;['quickTorsion','torsionZero','torsionQuarter'].forEach(id=>$(id).disabled=disabled);
+  $('rotationAxisLabel').textContent=j<0?'Add a neighbouring centre':group.locked?'Ring closure: torsion fixed':`Twist · ${Math.round(c.torsion||0)}°`;
+  $('torsionHelp').textContent=j<0?'Attach another centre to define a σ axis.':group.locked?'Independent rotation would break this ring. Choose a bond outside the ring.':`C${i+1}${group.indices.length>1?' and its attached branch rotate':' rotates'} about the fixed σ axis. A 90° relative twist removes an initially aligned π overlap.`;
 }
 function setQuickTorsion(value){
-  const i=state.activeCenter;if(bondNeighbor(i)<0)return;
-  state.sigmaLock=true;state.autoFace=true;state.centers[i].torsion=Number(value);
-  $('sigmaLock').checked=true;$('autoFace').checked=true;updateCentersUI();updateInfo();refreshDisplay();
+  if(twistCentre(state.activeCenter,value)){updateInfo();refreshDisplay();}
 }
 $('rotateCentre').onchange=e=>activateCenter(Number(e.target.value));
+$('rotationBond').onchange=e=>{chooseRotationBond(state.activeCenter,Number(e.target.value));updateRotationPanel();updateSelectedPiStatus();};
 $('quickTorsion').oninput=e=>setQuickTorsion(e.target.value);
+$('quickTorsion').addEventListener('pointerdown',()=>{torsionInputActive=true;});
+document.addEventListener('pointerup',()=>{torsionInputActive=false;});
+document.addEventListener('pointercancel',()=>{torsionInputActive=false;});
 $('torsionZero').onclick=()=>setQuickTorsion(0);
 $('torsionQuarter').onclick=()=>setQuickTorsion(90);
 function wrapDegrees(x){return ((x+180)%360+360)%360-180;}
 function rotateCenterByDrag(i,dx,dy){
-  const c=state.centers[i];
-  if(state.sigmaLock&&bondNeighbor(i)>=0)c.torsion=wrapDegrees(c.torsion+(dx-dy)*.65);
-  else {c.rot[1]=wrapDegrees(c.rot[1]+dx*.65);c.rot[0]=wrapDegrees(c.rot[0]+dy*.65);}
-  const list=$('centersList');
-  list.querySelectorAll(`.torsionSlider[data-i="${i}"]`).forEach(e=>e.value=c.torsion);
-  list.querySelectorAll(`.torsionVal[data-i="${i}"]`).forEach(e=>e.textContent=`${Math.round(c.torsion)}°`);
-  list.querySelectorAll(`.rotSlider[data-i="${i}"]`).forEach(e=>e.value=c.rot[+e.dataset.k]);
-  list.querySelectorAll(`.rotVal[data-i="${i}"]`).forEach(e=>e.textContent=`${Math.round(c.rot[+e.dataset.k])}°`);
-  updatePiStatus();
+  const c=state.centers[i];if(!c)return;
+  if(twistCentre(i,wrapDegrees((c.torsion||0)+(dx-dy)*.65))){updateInfo();refreshDisplay();}
+}
+let pendingDrag=null;
+function flushDrag(){
+  const p=pendingDrag;pendingDrag=null;if(!p)return;
+  if(p.centre>=0&&p.mode==='rotate')rotateCenterByDrag(p.centre,p.dx,p.dy);
+  else {state.yaw+=p.dx*.008;state.pitch=clamp(state.pitch+p.dy*.008,-1.48,1.48);}
 }
 const touchPointers=new Map();let pinchActive=false,pinchDistance=1,pinchZoom=1;
 function touchDistance(){const p=[...touchPointers.values()];return Math.hypot(p[0].x-p[1].x,p[0].y-p[1].y)||1;}
@@ -1341,11 +1340,11 @@ canvas.addEventListener('pointermove',e=>{
   if(!state.pointerMoved&&Math.hypot(e.clientX-state.pointerStart[0],e.clientY-state.pointerStart[1])<5)return;
   state.pointerMoved=true;
   const dx=e.clientX-state.lastX,dy=e.clientY-state.lastY;state.lastX=e.clientX;state.lastY=e.clientY;
-  if(state.dragCenter>=0&&state.mode==='rotate')rotateCenterByDrag(state.dragCenter,dx,dy);
-  else {state.yaw+=dx*.008;state.pitch=clamp(state.pitch+dy*.008,-1.48,1.48);}
+  if(!pendingDrag)pendingDrag={centre:state.dragCenter,mode:state.mode,dx:0,dy:0};pendingDrag.dx+=dx;pendingDrag.dy+=dy;
 });
 function stopDrag(e){
   if(e&&state.dragPointer!==e.pointerId)return;
+  flushDrag();
   state.dragging=false;state.dragCenter=-1;state.dragPointer=null;canvas.classList.remove('dragging');
   if(e&&canvas.hasPointerCapture&&canvas.hasPointerCapture(e.pointerId))canvas.releasePointerCapture(e.pointerId);
 }
@@ -1395,6 +1394,7 @@ if(window.ResizeObserver)new ResizeObserver(resize).observe(stage);
 adaptMobile();
 
 function animate(t){
+  flushDrag();
   const dt=Math.min(.05,(t-state.lastT)/1000);state.lastT=t;if(state.spin&&!state.dragging)state.yaw+=dt*.42;
   const renderKey=JSON.stringify([canvas.width,canvas.height,{...state,lastT:0}]);
   if(renderKey!==lastRenderKey){drawScene();lastRenderKey=renderKey;}
@@ -1410,13 +1410,14 @@ function historyButtons(){$('undoAction').disabled=!undoStack.length;$('redoActi
 function beginHistory(){if(!restoring&&!historyBefore)historyBefore=snapshot();}
 function endHistory(){clearTimeout(historyTimer);if(!historyBefore)return;const before=historyBefore;historyBefore=null;if(JSON.stringify(before)!==JSON.stringify(snapshot())){undoStack.push(before);if(undoStack.length>80)undoStack.shift();redoStack.length=0;}historyButtons();}
 function syncWorkspace(){
-  document.querySelectorAll('input[id],select[id]').forEach(el=>{const key=controlMap[el.id]||el.id;if(!(key in initialState)||key==='attachHybrid'||key==='attachCentre')return;if(el.type==='radio')return;if(el.type==='checkbox')el.checked=!!state[key];else el.value=state[key];});
+  document.body.classList.toggle('controls-light',state.controlsTheme==='light');
+  document.querySelectorAll('input[id],select[id]').forEach(el=>{const key=controlMap[el.id]||el.id;if(!(key in initialState)||key==='attachHybrid'||key==='attachCentre'||(key==='lesson'&&!state.lesson))return;if(el.type==='radio')return;if(el.type==='checkbox')el.checked=!!state[key];else el.value=state[key];});
   ['spacing','sOpacity','opacity','pOpacity','size','pSize','backSize','zoom'].forEach(id=>{const el=$(id+'Val');if(el)el.textContent=Number(state[controlMap[id]||id]).toFixed(2)+(['size','pSize','backSize','zoom'].includes(id)?'×':'');});
   stage.classList.toggle('light',state.light);$('bgToggle').textContent=state.light?'Dark background':'Light background';$('overlapDescription').hidden=!state.showOverlapDescription;
   $('mobileInfo').setAttribute('aria-pressed',String(state.showOverlapDescription));$('mobileRemove').setAttribute('aria-pressed',String(state.removeElectronMode));
-  $('bondVolumeVal').textContent=$('bondVolume').value+'%';$('lessonGuide').textContent=lessonText[state.lesson]||'Choose a mode to continue.';$('inspectionText').hidden=true;setMode(state.mode,false);syncAllUI();lastRenderKey='';historyButtons();
+  $('bondVolumeVal').textContent=$('bondVolume').value+'%';$('firstCentreKind').value=state.newCentreKind;$('transparency').value=Math.round((1-state.opacity)*100);$('transparencyVal').textContent=$('transparency').value+'%';$('lessonGuide').textContent=lessonText[state.lesson]||'Choose a hybridization and add your first centre.';$('inspectionText').hidden=true;setMode(state.mode,false);syncAllUI();lastRenderKey='';historyButtons();
 }
-function restoreSnapshot(data){restoring=true;try{stableKeys.forEach(k=>{state[k]=JSON.parse(JSON.stringify(data.model[k]??initialState[k]));});state.dragging=false;state.dragPointer=null;state.clickOrbital=null;state.pickAttachment=false;state.spin=false;$('bondSound').checked=!!data.sound?.enabled;$('bondVolume').value=data.sound?.volume??20;syncWorkspace();}finally{restoring=false;}}
+function restoreSnapshot(data){restoring=true;try{stopDrag();reframeScene();stableKeys.forEach(k=>{state[k]=JSON.parse(JSON.stringify(data.model[k]??initialState[k]));});state.dragging=false;state.dragPointer=null;state.clickOrbital=null;state.pickAttachment=false;state.spin=false;state.sigmaLock=true;state.autoFace=true;if(state.colorMode==='orbital')state.colorMode='mono';state.pOpacity=state.sOpacity=state.opacity;if(state.pMode==='phase')state.colorMode='phase';$('bondSound').checked=!!data.sound?.enabled;$('bondVolume').value=data.sound?.volume??20;syncWorkspace();}finally{restoring=false;}}
 function undo(){endHistory();if(!undoStack.length)return;redoStack.push(snapshot());restoreSnapshot(undoStack.pop());workspaceMessage('Undone.');}
 function redo(){endHistory();if(!redoStack.length)return;undoStack.push(snapshot());restoreSnapshot(redoStack.pop());workspaceMessage('Redone.');}
 $('undoAction').onclick=undo;$('redoAction').onclick=redo;
@@ -1425,7 +1426,7 @@ document.addEventListener('pointerdown',e=>{if($('bondSound').checked&&!audioCon
 document.addEventListener('pointerup',()=>{clearTimeout(historyTimer);historyTimer=setTimeout(endHistory,150);});
 ['click','input','change'].forEach(type=>document.addEventListener(type,e=>{if(noHistory.has(e.target.id)||e.target.id==='structureFile')return;if(e.target.closest('button,input,select')){beginHistory();clearTimeout(historyTimer);historyTimer=setTimeout(endHistory,type==='input'?350:0);}},true));
 document.addEventListener('keydown',e=>{if((e.ctrlKey||e.metaKey)&&e.key.toLowerCase()==='z'){e.preventDefault();e.shiftKey?redo():undo();}else if((e.ctrlKey||e.metaKey)&&e.key.toLowerCase()==='y'){e.preventDefault();redo();}else if(e.key==='Escape'){state.pickAttachment=false;state.attachmentHighlight=false;updateAttachmentUI();}});
-function setMode(mode,clear=true){if(mode==='rotate'&&clear){state.sigmaLock=true;state.autoFace=true;$('sigmaLock').checked=true;$('autoFace').checked=true;}state.mode=mode;state.editElectrons=mode==='electrons';$('editElectrons').checked=state.editElectrons&&!state.removeElectronMode;$('removeElectronMode').checked=state.editElectrons&&state.removeElectronMode;$('mobileRemove').setAttribute('aria-pressed',String(state.editElectrons&&state.removeElectronMode));$('mobileRemove').title=state.editElectrons?(state.removeElectronMode?'Removing electrons · click to switch to adding':'Adding electrons · click to switch to removing'):'Enable electron editing (add)';$('interactionMode').value=mode;if(clear){if($('inspectionText'))$('inspectionText').hidden=true;state.pickAttachment=false;state.attachmentHighlight=false;updateAttachmentUI();}const hints={build:'Build: click a free hybrid to preview an attachment, then Attach centre.',electrons:state.removeElectronMode?'Click an orbital to remove an electron. Use ± e⁻ to switch to adding.':'Click an orbital to add an electron. Shift-click to remove it. Two electrons in one orbital form a lone pair.',rotate:'Drag a centre or its orbital to twist about its σ axis. Use the torsion slider or 90° button to demonstrate loss of π overlap.',inspect:'Click an orbital to explain its overlap and bonding status.'};document.querySelector('.hint').textContent=hints[mode]+' · Wheel or pinch to zoom';canvas.style.cursor=mode==='rotate'?'grab':'crosshair';updateRotationPanel();if(mode==='rotate')updateSelectedPiStatus();}
+function setMode(mode,clear=true){$('electronTools').hidden=mode!=='electrons';if(mode==='rotate'&&clear){state.sigmaLock=true;state.autoFace=true;$('sigmaLock').checked=true;$('autoFace').checked=true;}state.sigmaLock=true;state.autoFace=true;state.mode=mode;state.editElectrons=mode==='electrons';$('editElectrons').checked=state.editElectrons&&!state.removeElectronMode;$('removeElectronMode').checked=state.editElectrons&&state.removeElectronMode;$('mobileRemove').setAttribute('aria-pressed',String(state.editElectrons&&state.removeElectronMode));$('mobileRemove').title=state.editElectrons?(state.removeElectronMode?'Removing electrons · click to switch to adding':'Adding electrons · click to switch to removing'):'Enable electron editing (add)';$('interactionMode').value=mode;if(clear){if($('inspectionText'))$('inspectionText').hidden=true;state.pickAttachment=false;state.attachmentHighlight=false;updateAttachmentUI();}const hints={build:'Build: click a free hybrid to preview an attachment, then Attach centre.',electrons:state.removeElectronMode?'Click an orbital to remove an electron. Use ± e⁻ to switch to adding.':'Click an orbital to add an electron. Shift-click to remove it. Two electrons in one orbital form a lone pair.',rotate:'Drag a centre or its orbital to twist about its selected σ axis. Its attached branch follows. Drag empty space to turn the scene.',inspect:'Click an orbital to explain its overlap and bonding status.'};document.querySelector('.hint').textContent=hints[mode]+' · Wheel or pinch to zoom';canvas.style.cursor=mode==='rotate'?'grab':'crosshair';updateLegend();updateRotationPanel();if(mode==='rotate')updateSelectedPiStatus();}
 $('interactionMode').onchange=e=>setMode(e.target.value);
 function attachmentPreview(){
   if(exporting)return [];
@@ -1451,24 +1452,28 @@ function inspectOrbital(hit){
 }
 const lessonText={ethene:'Ethene skeleton: add one electron to each facing hybrid for the C–C σ bond, then one to each p orbital for its π bond. Rotate one centre to investigate π overlap. Terminal 1s functions represent H.',ethyne:'Ethyne skeleton: form one σ bond and two π bonds using the two distinct p orbitals on each sp centre. Show all p orbitals to find both pairs.',allene:'Allene skeleton: the central sp centre uses two different, perpendicular p orbitals. Form a π bond on each side; the terminal sp² planes are perpendicular.',ring:'Planar six-centre ring: form six σ bonds, then add one electron to each p orbital. The display selects three localized π bonds; real cyclic conjugation is delocalized, not restricted to one such arrangement.'};
 function loadLesson(name){
-  endHistory();beginHistory();Object.assign(state,JSON.parse(JSON.stringify(initialState)));state.lesson=name;state.mode='electrons';state.editElectrons=true;state.showTerminalS=name!=='ring';
+  if(!Object.hasOwn(lessonText,name))return;
+  endHistory();beginHistory();stopDrag();reframeScene();
+  state.lesson=name;state.centers=[];state.activeCenter=0;state.overlapPair=0;state.attachCentre=0;state.attachHybrid=-1;state.attachmentHighlight=false;state.pickAttachment=false;state.clickOrbital=null;
   const centre=(kind,base,frame,reference)=>({kind,base,frame,reference,bondHybrid:0,selected:0,selectedP:0,pos:[0,0,0],rot:[0,0,0],torsion:0,electrons:{}});
   const reverse=[[-1,0,0],[0,-1,0],[0,0,1]];
+  if(name==='ethene')state.centers=[centre('sp2',[-.5,0,0],identityMatrix(),1),centre('sp2',[.5,0,0],reverse,0)];
   if(name==='ethyne')state.centers=[centre('sp',[-.5,0,0],identityMatrix(),1),centre('sp',[.5,0,0],reverse,0)];
   if(name==='allene')state.centers=[centre('sp2',[-1,0,0],identityMatrix(),1),centre('sp',[0,0,0],identityMatrix(),2),centre('sp2',[1,0,0],[[-1,0,0],[0,0,1],[0,1,0]],1)];
   if(name==='ring'){state.centers=[];for(let i=0;i<6;i++){const a=i*Math.PI/3,base=[Math.cos(a),Math.sin(a),0],prior=[Math.cos(a-Math.PI/3),Math.sin(a-Math.PI/3),0],x=norm(sub(prior,base)),y=cross([0,0,1],x);state.centers.push(centre('sp2',base,[[x[0],y[0],0],[x[1],y[1],0],[0,0,1]],(i+5)%6));}}
   state.centers.forEach((c,i)=>{c.pPhases=orbitalData[c.kind].pAxes.map((_,k)=>{const v=applyM(centerOrientation(i),orbitalData[c.kind].pAxes[k]);const dominant=v.reduce((best,n,j)=>Math.abs(n)>Math.abs(v[best])?j:best,0);return v[dominant]<0?-1:1;});});
-  $('lessonGuide').textContent=lessonText[name];$('inspectionText').hidden=true;syncWorkspace();endHistory();workspaceMessage('Example loaded with no electrons. Follow the exercise above.');
+  $('lessonGuide').textContent=lessonText[name];$('inspectionText').hidden=true;syncWorkspace();endHistory();workspaceMessage('Example loaded with no electrons. Your settings have been kept. Use Electrons mode to form bonds.');
 }
 $('loadLesson').onclick=()=>loadLesson($('lessonPreset').value);$('resetLesson').onclick=()=>loadLesson(state.lesson);
 $('saveStructure').onclick=()=>{endHistory();const data={format:'waterloo-hybrid-visualizer',version:1,...snapshot()};const url=URL.createObjectURL(new Blob([JSON.stringify(data,null,2)],{type:'application/json'}));const a=document.createElement('a');a.href=url;a.download='orbital-structure.json';a.click();setTimeout(()=>URL.revokeObjectURL(url),1000);workspaceMessage('Structure saved, including electrons, geometry and display settings.');};
 function validateStructure(data){
-  if(data?.format!=='waterloo-hybrid-visualizer'||data.version!==1||!data.model||!Array.isArray(data.model.centers)||data.model.centers.length<1||data.model.centers.length>16)throw Error('Choose a structure saved by this visualizer (1–16 centres).');
+  if(data?.format!=='waterloo-hybrid-visualizer'||data.version!==1||!data.model||!Array.isArray(data.model.centers)||data.model.centers.length<0||data.model.centers.length>16)throw Error('Choose a structure saved by this visualizer (0–16 centres).');
   const m=data.model,vector=v=>Array.isArray(v)&&v.length===3&&v.every(n=>typeof n==='number'&&Number.isFinite(n)&&Math.abs(n)<1000);
   m.centers.forEach(c=>{if(!Object.hasOwn(orbitalData,c.kind)||!vector(c.base)||!vector(c.pos)||!vector(c.rot)||!Number.isFinite(c.torsion)||!Array.isArray(c.frame)||c.frame.length!==3||!c.frame.every(vector))throw Error('Invalid centre geometry.');if(c.reference!==null&&(!Number.isInteger(c.reference)||c.reference<0||c.reference>=m.centers.length))throw Error('Invalid centre reference.');if(!Number.isInteger(c.selectedP)||c.selectedP<0||c.selectedP>=Math.max(1,orbitalData[c.kind].pAxes.length))throw Error('Invalid p orbital selection.');if(c.pPhases&&(!Array.isArray(c.pPhases)||c.pPhases.length>2||c.pPhases.some(n=>![-1,1].includes(n))))throw Error('Invalid orbital phases.');if(!Number.isInteger(c.selected)||c.selected<0||c.selected>=orbitalData[c.kind].vectors.length)throw Error('Invalid orbital selection.');for(const values of Object.values(c.electrons||{})){if(!Array.isArray(values)||values.length>6||values.some(n=>n!==null&&![0,1,2].includes(n)))throw Error('Invalid electron counts.');}const rows=c.frame;if(rows.some(r=>Math.abs(dot(r,r)-1)>.001)||Math.abs(dot(rows[0],rows[1]))>.001||Math.abs(dot(rows[0],rows[2]))>.001||Math.abs(dot(rows[1],rows[2]))>.001)throw Error('Invalid orientation matrix.');});
   for(const k of stableKeys){if(!(k in m))continue;const t=typeof initialState[k];if(t==='number'&&(!Number.isFinite(m[k])||Math.abs(m[k])>1000))throw Error('Invalid numeric setting.');if(t==='boolean'&&typeof m[k]!=='boolean')throw Error('Invalid display setting.');}
   if(m.spacing<1.2||m.spacing>4.2||!['build','electrons','rotate','inspect'].includes(m.mode)||!Object.hasOwn(orbitalData,m.newCentreKind))throw Error('Invalid workspace settings.');
   for(const [k,options] of Object.entries({renderMode:['all','none','centre'],pMode:['all','none','phase'],colorMode:['orbital','phase','mono']}))if(!options.includes(m[k]))throw Error('Invalid display mode.');
+  if(m.controlsTheme!==undefined&&!['light','dark'].includes(m.controlsTheme))throw Error('Invalid controls background.');
   if(data.sound&&(!Number.isFinite(data.sound.volume)||data.sound.volume<0||data.sound.volume>100))throw Error('Invalid sound volume.');return data;
 }
 $('loadStructure').onclick=()=>$('structureFile').click();
@@ -1669,7 +1674,7 @@ async function exportView(kind){
 }
 $('downloadSVG').onclick=()=>exportView('svg');$('downloadPDF').onclick=()=>exportView('pdf');
 
-resize();syncAllUI();resetView();requestAnimationFrame(animate);
+resize();syncWorkspace();resetView();requestAnimationFrame(animate);
 })();
 </script>
 </body>
